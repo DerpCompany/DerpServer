@@ -1,3 +1,4 @@
+/*
 package com.derpcompany.server
 
 import java.time.LocalDateTime
@@ -5,11 +6,13 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.util.*
 
+*/
 /**
  * Author: garci
  * Version: 1.0
  * Date: 6/15/2022 11:52
- */
+ *//*
+
 
 private val daysLookup = (1..31).associate { it.toLong() to getOrdinal(it) }
 
@@ -42,3 +45,4 @@ fun String.toSlug() = lowercase(Locale.getDefault())
 
 //format local time to english format
 fun LocalDateTime.format() = this.format(englishDateFormatter)
+*/

@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
  */
 
 @WebMvcTest
-class HttpControllersTests(@Autowired val mockMvc: MockMvc) {
+class UserControllersTests(@Autowired val mockMvc: MockMvc) {
     @MockkBean
     private lateinit var userRepository: UserRepository
 
