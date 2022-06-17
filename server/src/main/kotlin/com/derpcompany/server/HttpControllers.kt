@@ -21,13 +21,13 @@ import org.springframework.web.server.ResponseStatusException
 class AricleController(private val repository: ArticleRepository) {
 
     @GetMapping("/")
-    fun findAll() {
-        repository.findAllByOrderByAddedAtDesc()
+    fun findAll(): Iterable<Article> {
+        return repository.findAllByOrderByAddedAtDesc()
     }
 
     @GetMapping("/{slug}")
-    fun findOne(@PathVariable slug: String) {
-        repository.findBySlug(slug) ?: throw ResponseStatusException(
+    fun findOne(@PathVariable slug: String): Article {
+        return repository.findBySlug(slug) ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND, "This article doesn't exist"
         )
     }
@@ -40,13 +40,13 @@ class AricleController(private val repository: ArticleRepository) {
 @RequestMapping("/api/user")
 class UserController(private val repository: UserRepository) {
     @GetMapping("/")
-    fun findAll() {
-        repository.findAll()
+    fun findAll(): Iterable<User> {
+        return repository.findAll()
     }
 
     @GetMapping("/{username}")
-    fun findOne(@PathVariable username: String) {
-        repository.findByUsername(username) ?: throw ResponseStatusException(
+    fun findOne(@PathVariable username: String): User {
+        return repository.findByUsername(username) ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND, "This user doesn't exist"
         )
     }
