@@ -8,7 +8,7 @@ plugins {
 	kotlin("plugin.jpa") version "1.6.21"
 	kotlin("plugin.allopen") version "1.4.32"
 	kotlin("kapt") version "1.4.32"
-
+	id("jacoco")
 }
 
 allOpen {
@@ -53,4 +53,21 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+// Configure Jacoco test coverage
+tasks.jacocoTestReport {
+	reports {
+		xml.required.set(true)
+		csv.required.set(true)
+		html.required.set(true)
+	}
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
+}
+
+tasks.build {
+	dependsOn(tasks.jacocoTestReport) // tests are required to run before generating the report
 }
