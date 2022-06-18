@@ -27,7 +27,7 @@ import org.springframework.web.server.ResponseStatusException
 class UserApi(private val userService: UserService) {
     @PostMapping("/")
     fun createAccount(): User {
-
+        TODO("Implement function")
     }
     @GetMapping("/")
     fun findAll(): Iterable<User> {
