@@ -40,6 +40,9 @@ class UserService(private val userRepository: UserRepository) {
         return userRepository.findByUserId(id)
     }
 
+    /**
+     * Update username and email of an existing account
+     */
     fun updateUser(id: String, request: User): User {
         val userToUpdate = findById(id) ?: throw NotFoundException("User doesn't exist, sorry!")
 
@@ -49,5 +52,15 @@ class UserService(private val userRepository: UserRepository) {
                 email = request.email
             }
         )
+        return updatedUser
+    }
+
+    /**
+     * Delete an existing user account
+     */
+    fun deleteUser(id: String) {
+        val userToDelete = findById(id) ?: throw NotFoundException("Sorry, user not found!")
+
+        userRepository.delete(userToDelete)
     }
 }
