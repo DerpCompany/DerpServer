@@ -1,6 +1,5 @@
 package com.derpcompany.server
 
-import com.derpcompany.server.entities.User
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,29 +16,35 @@ import org.springframework.data.repository.findByIdOrNull
 @DataJpaTest
 class RepositoriesTests @Autowired constructor(
     val entityManager: TestEntityManager,
-    val userRepository: UserRepository,
+    val authorRepository: AuthorRepository,
+    val articleRepository: ArticleRepository
 ) {
     @Test
-    fun `When findByIdOrNull then return User`() {
-        val empathyAwaits = User(
-            "empathyAwaits", "garcia.alcia1990@gmail.com", "admin"
+    fun `When findByIdOrNull then return Article`() {
+        val empathyAwaits = Author(
+            "empathyAwaits", "garcia.alcia1990@gmail.com", "admin", "Discord"
         )
         entityManager.persist(empathyAwaits)
+
+        val article = Article(
+            "Spring Framework 5.0 goes GA", "Dear Spring community ...", "Lorem ipsum", empathyAwaits
+        )
+        entityManager.persist(article)
         entityManager.flush()
 
-        val found = userRepository.findByUserId(empathyAwaits.username)
-        assertThat(found).isEqualTo(empathyAwaits)
+        val found = articleRepository.findByIdOrNull(article.id!!)
+        assertThat(found).isEqualTo(article)
     }
 
     @Test
     fun `When findByLogin then return User`() {
-        val empathyAwaits = User(
-            "empathyAwaits", "garcia.alcia1990@gmail.com", "admin"
+        val empathyAwaits = Author(
+            "empathyAwaits", "garcia.alcia1990@gmail.com", "admin", "Discord"
         )
         entityManager.persist(empathyAwaits)
         entityManager.flush()
 
-        val user = userRepository.findById(empathyAwaits.username)
+        val user = authorRepository.findByUsername(empathyAwaits.username)
         assertThat(user).isEqualTo(empathyAwaits)
     }
 }

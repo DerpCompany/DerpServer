@@ -1,6 +1,6 @@
-package com.derpcompany.server
+package com.derpcompany.server.repositories
 
-import com.derpcompany.server.entities.User
+import com.derpcompany.server.entities.*
 import org.springframework.data.mongodb.repository.MongoRepository
 
 /**

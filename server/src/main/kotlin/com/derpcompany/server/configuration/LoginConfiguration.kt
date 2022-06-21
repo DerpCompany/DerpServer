@@ -1,6 +1,6 @@
 package com.derpcompany.server.configuration
 
-import com.derpcompany.server.UserRepository
+import UserRepository
 import com.derpcompany.server.entities.User
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean

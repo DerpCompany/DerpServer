@@ -1,6 +1,6 @@
 package com.derpcompany.server.service
 
-import com.derpcompany.server.UserRepository
+import com.derpcompany.server.repositories.UserRepository
 import com.derpcompany.server.entities.User
 import com.derpcompany.server.exceptions.NotFoundException
 import org.springframework.stereotype.Service
