@@ -11,7 +11,7 @@ data class ResponseUser(
     val modifiedDate: Long,
 )
 
-fun SavedUser.toResponseUsers(): ResponseUser {
+fun SavedUser.toResponseUser(): ResponseUser {
     return ResponseUser(
         userId = userId.toHexString(),
         username,
