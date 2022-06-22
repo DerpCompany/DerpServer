@@ -1,4 +1,4 @@
-package com.example.mongodb_server.entities
+package com.example.mongodb_server.repositories.entities
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document

@@ -1,6 +1,6 @@
 package com.example.mongodb_server.repositories
 
-import com.example.mongodb_server.entities.SavedUser
+import com.example.mongodb_server.repositories.entities.SavedUser
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 

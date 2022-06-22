@@ -1,4 +1,4 @@
-package com.example.mongodb_server.entities
+package com.example.mongodb_server.repositories.entities
 
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
@@ -12,6 +12,6 @@ data class SavedUser (
     val username: String,
     val email: String,
     val role: String, // TODO: convert to ENUM
-    val createdDate: LocalDateTime = LocalDateTime.now(),
-    val modifiedDate: LocalDateTime = LocalDateTime.now(),
+    val createdDate: LocalDateTime,
+    val modifiedDate: LocalDateTime,
 )
