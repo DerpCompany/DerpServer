@@ -1,6 +1,6 @@
 package com.example.mongodb_server.controllers
 
-import com.example.mongodb_server.entities.User
+import com.example.mongodb_server.entities.SavedUser
 import com.example.mongodb_server.repositories.UserRepository
 import org.bson.types.ObjectId
 import org.springframework.http.ResponseEntity
@@ -14,26 +14,26 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(private val userRepository: UserRepository) {
 
     @GetMapping
-    fun getAllUsers(): ResponseEntity<List<User>> {
-        val users = userRepository.findAll()
+    fun getAllUsers(): ResponseEntity<List<ResponseUser>> {
+        val users = userRepository.findAll().map { it.toResponseUsers() }
         return ResponseEntity.ok(users)
     }
 
     @GetMapping("/id/{id}")
-    fun getOneUserById(@PathVariable("id") id: String): ResponseEntity<User> {
-        val user = userRepository.findOneById(ObjectId(id))
+    fun getOneUserByUserId(@PathVariable("id") id: String): ResponseEntity<ResponseUser> {
+        val user = userRepository.findOneByUserId(ObjectId(id)).toResponseUsers()
         return ResponseEntity.ok(user)
     }
 
     @GetMapping("/username/{username}")
-    fun getOneUserByUsername(@PathVariable("usernmae") username: String): ResponseEntity<User> {
-        val user = userRepository.findByUsername(username)
+    fun getOneUserByUsername(@PathVariable("username") username: String): ResponseEntity<ResponseUser> {
+        val user = userRepository.findByUsername(username).toResponseUsers()
         return ResponseEntity.ok(user)
     }
 
     @GetMapping("/roles/{role}")
-    fun getUsersByRoles(@PathVariable("role") role: String): ResponseEntity<List<User>> {
-        val users = userRepository.findByRole(role)
+    fun getUsersByRoles(@PathVariable("role") role: String): ResponseEntity<List<ResponseUser>> {
+        val users = userRepository.findByRole(role).map { it.toResponseUsers() }
         return ResponseEntity.ok(users)
     }
 }

@@ -1,15 +1,15 @@
 package com.example.mongodb_server.repositories
 
-import com.example.mongodb_server.entities.User
+import com.example.mongodb_server.entities.SavedUser
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 
-interface UserRepository: MongoRepository<User, String> {
-    fun findOneById(id: ObjectId): User
+interface UserRepository: MongoRepository<SavedUser, String> {
+    fun findOneByUserId(id: ObjectId): SavedUser
 
-    fun findByUsername(username: String): User
+    fun findByUsername(username: String): SavedUser
 
-    fun findByRole(role: String): List<User>
+    fun findByRole(role: String): List<SavedUser>
 
     override fun deleteAll()
 }
