@@ -4,7 +4,7 @@ import com.example.mongodb_server.repositories.entities.SavedUser
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 
-interface UserRepository: MongoRepository<SavedUser, String> {
+interface AccountRepository: MongoRepository<SavedUser, String> {
     fun findOneByUserId(id: ObjectId): SavedUser
 
     fun findByUsername(username: String): SavedUser

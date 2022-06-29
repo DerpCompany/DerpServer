@@ -1,9 +1,9 @@
 package com.example.mongodb_server.integrationtests
 
 import com.example.mongodb_server.controllers.data.NewAccount
-import com.example.mongodb_server.controllers.data.ResponseUser
+import com.example.mongodb_server.controllers.data.ProfileResponse
 import com.example.mongodb_server.repositories.entities.SavedUser
-import com.example.mongodb_server.repositories.UserRepository
+import com.example.mongodb_server.repositories.AccountRepository
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -34,7 +34,7 @@ import java.time.LocalDateTime
 @ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserControllerTests @Autowired constructor(
-    private val userRepository: UserRepository, private val restTemplate: TestRestTemplate
+    private val accountRepository: AccountRepository, private val restTemplate: TestRestTemplate
 ) {
     // SETUP
     private val testUser1 = SavedUser(
@@ -71,7 +71,7 @@ class UserControllerTests @Autowired constructor(
 
     @BeforeEach
     fun setUp() {
-        userRepository.deleteAll()
+        accountRepository.deleteAll()
     }
 
     private fun getRootUrl(): String {
@@ -79,13 +79,13 @@ class UserControllerTests @Autowired constructor(
     }
 
     private fun saveUsers() {
-        userRepository.save(testUser1)
-        userRepository.save(testUser2)
-        userRepository.save(testUser3)
-        userRepository.save(testUser4)
-        userRepository.save(testUser5)
-        userRepository.save(testUser6)
-        userRepository.save(testUser7)
+        accountRepository.save(testUser1)
+        accountRepository.save(testUser2)
+        accountRepository.save(testUser3)
+        accountRepository.save(testUser4)
+        accountRepository.save(testUser5)
+        accountRepository.save(testUser6)
+        accountRepository.save(testUser7)
     }
 
     // TESTS
@@ -115,7 +115,7 @@ class UserControllerTests @Autowired constructor(
         // DO
         val response = restTemplate.getForEntity(
             getRootUrl() + "/id/$userId",
-            ResponseUser::class.java
+            ProfileResponse::class.java
         )
 
         // ASSERT
@@ -133,7 +133,7 @@ class UserControllerTests @Autowired constructor(
         // DO
         val response = restTemplate.getForEntity(
             getRootUrl() + "/username/$username",
-            ResponseUser::class.java
+            ProfileResponse::class.java
         )
 
         // ASSERT
@@ -170,7 +170,7 @@ class UserControllerTests @Autowired constructor(
         val response = restTemplate.postForEntity(
             getRootUrl(),
             NewAccount(username, email),
-            ResponseUser::class.java
+            ProfileResponse::class.java
         )
 
         // ASSERT
@@ -197,7 +197,7 @@ class UserControllerTests @Autowired constructor(
                 NewAccount(newUsername, newEmail),
                 HttpHeaders(),
             ),
-            ResponseUser::class.java
+            ProfileResponse::class.java
         )
 
         // ASSERT
@@ -225,7 +225,7 @@ class UserControllerTests @Autowired constructor(
         // ASSERT
         assertEquals(204, deleteUser.statusCode.value())
         assertThrows(EmptyResultDataAccessException::class.java) {
-            userRepository.findOneByUserId(userToDelete)
+            accountRepository.findOneByUserId(userToDelete)
         }
     }
 
