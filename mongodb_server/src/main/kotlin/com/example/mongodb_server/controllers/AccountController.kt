@@ -34,7 +34,7 @@ class AccountController(private val accountRepository: AccountRepository) {
      */
     @GetMapping("/profile/{id}")
     fun getOneProfileById(@PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
-        val user = accountRepository.findOneByUserId(ObjectId(id)).toProfileResponse()
+        val user = accountRepository.findOneByAccountId(ObjectId(id)).toProfileResponse()
         return ResponseEntity.ok(user)
     }
 
@@ -80,7 +80,7 @@ class AccountController(private val accountRepository: AccountRepository) {
      */
     @PutMapping("/account/{id}")
     fun updateAccount(@RequestBody request: AccountRequest, @PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
-        val user = accountRepository.findOneByUserId(ObjectId(id))
+        val user = accountRepository.findOneByAccountId(ObjectId(id))
 
         val updatedUser = (Account(
             accountId = user.accountId,

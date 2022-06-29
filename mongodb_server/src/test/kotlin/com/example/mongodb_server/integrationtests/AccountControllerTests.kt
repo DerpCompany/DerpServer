@@ -75,7 +75,7 @@ class AccountControllerTests @Autowired constructor(
     }
 
     private fun getRootUrl(): String {
-        return "http://localhost:$port/api/user"
+        return "http://localhost:$port/api"
     }
 
     private fun saveUsers() {
@@ -96,7 +96,7 @@ class AccountControllerTests @Autowired constructor(
 
         // DO
         val response = restTemplate.getForEntity(
-            getRootUrl(),
+            getRootUrl() + "/profile",
             List::class.java
         )
 
@@ -114,14 +114,14 @@ class AccountControllerTests @Autowired constructor(
 
         // DO
         val response = restTemplate.getForEntity(
-            getRootUrl() + "/id/$userId",
+            getRootUrl() + "/profile/$userId",
             ProfileResponse::class.java
         )
 
         // ASSERT
         assertEquals(200, response.statusCode.value())
         assertNotNull(response.body)
-        assertEquals(userId.toHexString(), response.body?.userId)
+        assertEquals(userId.toHexString(), response.body?.accountId)
     }
 
     @Test
@@ -132,7 +132,7 @@ class AccountControllerTests @Autowired constructor(
 
         // DO
         val response = restTemplate.getForEntity(
-            getRootUrl() + "/username/$username",
+            getRootUrl() + "/profile/username/$username",
             ProfileResponse::class.java
         )
 
@@ -150,7 +150,7 @@ class AccountControllerTests @Autowired constructor(
 
         // DO
         val response = restTemplate.getForEntity(
-            getRootUrl() + "/roles/$role",
+            getRootUrl() + "/profile/role/$role",
             List::class.java
         )
 
@@ -169,7 +169,7 @@ class AccountControllerTests @Autowired constructor(
 
         // DO
         val response = restTemplate.postForEntity(
-            getRootUrl(),
+            getRootUrl() + "/account",
             AccountRequest(username, email, password),
             ProfileResponse::class.java
         )
@@ -194,7 +194,7 @@ class AccountControllerTests @Autowired constructor(
 
         // DO
         val response = restTemplate.exchange(
-            getRootUrl() + "/$userToUpdate",
+            getRootUrl() + "/account/$userToUpdate",
             HttpMethod.PUT,
             HttpEntity(
                 AccountRequest(newUsername, newEmail, password),
@@ -219,7 +219,7 @@ class AccountControllerTests @Autowired constructor(
 
         // DO
         val deleteUser = restTemplate.exchange(
-            getRootUrl() + "/$userToDelete",
+            getRootUrl() + "/account/$userToDelete",
             HttpMethod.DELETE,
             HttpEntity(null, HttpHeaders()),
             ResponseEntity::class.java
@@ -228,7 +228,7 @@ class AccountControllerTests @Autowired constructor(
         // ASSERT
         assertEquals(204, deleteUser.statusCode.value())
         assertThrows(EmptyResultDataAccessException::class.java) {
-            accountRepository.findOneByUserId(userToDelete)
+            accountRepository.findOneByAccountId(userToDelete)
         }
     }
 
