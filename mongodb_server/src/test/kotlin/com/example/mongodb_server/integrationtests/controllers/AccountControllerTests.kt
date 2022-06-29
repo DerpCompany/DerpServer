@@ -1,6 +1,7 @@
-package com.example.mongodb_server.integrationtests
+package com.example.mongodb_server.integrationtests.controllers
 
 import com.example.mongodb_server.controllers.data.AccountRequest
+import com.example.mongodb_server.controllers.data.AccountResponse
 import com.example.mongodb_server.controllers.data.ProfileResponse
 import com.example.mongodb_server.repositories.entities.Account
 import com.example.mongodb_server.repositories.AccountRepository
@@ -10,8 +11,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvFileSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -37,32 +36,12 @@ class AccountControllerTests @Autowired constructor(
     private val accountRepository: AccountRepository, private val restTemplate: TestRestTemplate
 ) {
     // SETUP
-    private val testUser1 = Account(
+    private val testAccount1 = Account(
         ObjectId(), "empathyawaits", "empathyawaits@gmail.com", "admin", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
-    private val testUser2 = Account(
+    private val testAccount2 = Account(
         ObjectId(), "cramsan", "crams@gmail.com", "moderator", "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testUser3 = Account(
-        ObjectId(), "hythloday", "hyth@gmail.com", "admin", "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testUser4 = Account(
-        ObjectId(), "taco", "taco@gmail.com", "moderator", "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testUser5 = Account(
-        ObjectId(), "animus", "animus@gmail.com", "admin", "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testUser6 = Account(
-        ObjectId(), "jouhou", "houjou@gmail.com", "admin", "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testUser7 = Account(
-        ObjectId(), "steely", "wools@gmail.com", "member", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
 
@@ -78,86 +57,9 @@ class AccountControllerTests @Autowired constructor(
         return "http://localhost:$port/api"
     }
 
-    private fun saveUsers() {
-        accountRepository.save(testUser1)
-        accountRepository.save(testUser2)
-        accountRepository.save(testUser3)
-        accountRepository.save(testUser4)
-        accountRepository.save(testUser5)
-        accountRepository.save(testUser6)
-        accountRepository.save(testUser7)
-    }
-
-    // TESTS
-    @Test
-    fun `should return all users`() {
-        // WHEN
-        saveUsers()
-
-        // DO
-        val response = restTemplate.getForEntity(
-            getRootUrl() + "/profile",
-            List::class.java
-        )
-
-        // ASSERT
-        assertEquals(200, response.statusCode.value())
-        assertNotNull(response.body)
-        assertEquals(7, response.body?.size)
-    }
-
-    @Test
-    fun `should return single user by id`() {
-        // WHEN
-        saveUsers()
-        val userId = testUser7.accountId
-
-        // DO
-        val response = restTemplate.getForEntity(
-            getRootUrl() + "/profile/$userId",
-            ProfileResponse::class.java
-        )
-
-        // ASSERT
-        assertEquals(200, response.statusCode.value())
-        assertNotNull(response.body)
-        assertEquals(userId.toHexString(), response.body?.accountId)
-    }
-
-    @Test
-    fun `should return single user by username`() {
-        // WHEN
-        saveUsers()
-        val username = testUser3.username
-
-        // DO
-        val response = restTemplate.getForEntity(
-            getRootUrl() + "/profile/username/$username",
-            ProfileResponse::class.java
-        )
-
-        // ASSERT
-        assertEquals(200, response.statusCode.value())
-        assertNotNull(response.body)
-        assertEquals(username, response.body?.username)
-    }
-
-    @ParameterizedTest
-    @CsvFileSource(resources = ["/getUserByRoleTests.csv"], numLinesToSkip = 1)
-    fun `should return a list of users with the same role`(role: String, expected: Int) {
-        // WHEN
-        saveUsers()
-
-        // DO
-        val response = restTemplate.getForEntity(
-            getRootUrl() + "/profile/role/$role",
-            List::class.java
-        )
-
-        // ASSERT
-        assertEquals(200, response.statusCode.value())
-        assertNotNull(response.body)
-        assertEquals(expected, response.body?.size)
+    private fun saveAccounts() {
+        accountRepository.save(testAccount1)
+        accountRepository.save(testAccount2)
     }
 
     @Test
@@ -171,7 +73,7 @@ class AccountControllerTests @Autowired constructor(
         val response = restTemplate.postForEntity(
             getRootUrl() + "/account",
             AccountRequest(username, email, password),
-            ProfileResponse::class.java
+            AccountResponse::class.java
         )
 
         // ASSERT
@@ -184,13 +86,12 @@ class AccountControllerTests @Autowired constructor(
     @Test
     fun `should update an existing account `() {
         // WHEN
-        saveUsers()
+        saveAccounts()
 
-        val userToUpdate = testUser2.accountId
+        val userToUpdate = testAccount2.accountId
         val newUsername = "crams"
         val newEmail = "crasson@gmail.com"
         val password = "test4321"
-
 
         // DO
         val response = restTemplate.exchange(
@@ -200,7 +101,7 @@ class AccountControllerTests @Autowired constructor(
                 AccountRequest(newUsername, newEmail, password),
                 HttpHeaders(),
             ),
-            ProfileResponse::class.java
+            AccountResponse::class.java
         )
 
         // ASSERT
@@ -213,8 +114,8 @@ class AccountControllerTests @Autowired constructor(
     @Test
     fun `should delete an existing account`() {
         // WHEN
-        saveUsers()
-        val userToDelete = testUser4.accountId
+        saveAccounts()
+        val userToDelete = testAccount1.accountId
 
 
         // DO

@@ -3,11 +3,12 @@ package com.example.mongodb_server.controllers
 import com.example.mongodb_server.controllers.data.*
 import com.example.mongodb_server.repositories.entities.Account
 import com.example.mongodb_server.repositories.AccountRepository
+import com.example.mongodb_server.repositories.ProfileRepository
+import com.example.mongodb_server.repositories.entities.Profile
 import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -18,90 +19,77 @@ import java.time.LocalDateTime
 
 @RestController
 @RequestMapping ("/api")
-class AccountController(private val accountRepository: AccountRepository) {
-
-    /**
-     * Query all profiles. Excludes passwords
-     */
-    @GetMapping("/profile")
-    fun getAllProfiles(): ResponseEntity<List<ProfileResponse>> {
-        val users = accountRepository.findAll().map { it.toProfileResponse() }
-        return ResponseEntity.ok(users)
-    }
-
-    /**
-     * Query profile by ID. Excludes passwords
-     */
-    @GetMapping("/profile/{id}")
-    fun getOneProfileById(@PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
-        val user = accountRepository.findOneByAccountId(ObjectId(id)).toProfileResponse()
-        return ResponseEntity.ok(user)
-    }
-
-    /**
-     * Query user by username. Excludes passwords
-     */
-    @GetMapping("/profile/username/{username}")
-    fun getOneProfileByUsername(@PathVariable("username") username: String): ResponseEntity<ProfileResponse> {
-        val user = accountRepository.findByUsername(username).toProfileResponse()
-        return ResponseEntity.ok(user)
-    }
-
-    /**
-     * Query all profiles with specific role. Excludes passwords
-     */
-    @GetMapping("/profile/role/{role}")
-    fun getProfilesByRole(@PathVariable("role") role: String): ResponseEntity<List<ProfileResponse>> {
-        val users = accountRepository.findByRole(role).map { it.toProfileResponse() }
-        return ResponseEntity.ok(users)
-    }
-
+class AccountController(private val accountRepository: AccountRepository, private val profileRepository: ProfileRepository) {
     /**
      * Create new  account
      */
     @PostMapping("/account")
-    fun createAccount(@RequestBody request: AccountRequest): ResponseEntity<ProfileResponse> {
-        val newUser = (Account(
-            accountId = ObjectId(),
+    fun createAccount(@RequestBody request: AccountRequest): ResponseEntity<AccountResponse> {
+        val id = ObjectId()
+
+        val newUser = Account(
+            accountId = id,
             username = request.username,
             email = request.email,
             password = request.password,
             role = "unapproved",
             createdDate = LocalDateTime.now(),
             modifiedDate = LocalDateTime.now(),
-        ))
+        )
+
+        val newProfile = Profile(
+            profileId = id,
+            username = request.username,
+            email = request.email,
+            role = "unapproved",
+        )
 
         accountRepository.save(newUser)
-        return ResponseEntity(newUser.toProfileResponse(), HttpStatus.CREATED)
+        profileRepository.save(newProfile)
+
+        return ResponseEntity(newUser.toAccountResponse(), HttpStatus.CREATED)
     }
 
     /**
      * Update an existing account
      */
     @PutMapping("/account/{id}")
-    fun updateAccount(@RequestBody request: AccountRequest, @PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
-        val user = accountRepository.findOneByAccountId(ObjectId(id))
+    fun updateAccount(@RequestBody request: AccountRequest, @PathVariable("id") id: String): ResponseEntity<AccountResponse> {
+        val account = accountRepository.findOneByAccountId(ObjectId(id))
+        val profile = profileRepository.findOneByProfileId((ObjectId(id)))
 
-        val updatedUser = (Account(
-            accountId = user.accountId,
+        val updatedUser = Account(
+            accountId = account.accountId,
             username = request.username,
             email = request.email,
-            password = request.password,
-            role = user.role,
-            createdDate = user.createdDate,
+            password = account.password,
+            role = account.role,
+            createdDate = account.createdDate,
             modifiedDate = LocalDateTime.now(),
-        ))
+        )
+
+        val updatedProfile = Profile(
+            profileId = profile.profileId,
+            username = request.username,
+            email = request.email,
+            role = profile.role,
+        )
 
         accountRepository.save(updatedUser)
-        return ResponseEntity.ok(updatedUser.toProfileResponse())
+        profileRepository.save(updatedProfile)
+
+        return ResponseEntity.ok(updatedUser.toAccountResponse())
     }
 
     /**
      * Delete an existing account
+     * TODO: Should have have a verification with a body request (AccountRequest)?
      */
     @DeleteMapping("/account/{id}")
-    fun deleteAccount(@PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
+    fun deleteAccount(@PathVariable("id") id: String): ResponseEntity<AccountResponse> {
         accountRepository.deleteById(id)
+        profileRepository.deleteById(id)
+
         return ResponseEntity.noContent().build()
     }
 }
