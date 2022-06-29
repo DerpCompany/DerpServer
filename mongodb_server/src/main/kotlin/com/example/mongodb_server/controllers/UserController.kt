@@ -1,7 +1,7 @@
 package com.example.mongodb_server.controllers
 
 import com.example.mongodb_server.controllers.data.*
-import com.example.mongodb_server.repositories.entities.SavedUser
+import com.example.mongodb_server.repositories.entities.Account
 import com.example.mongodb_server.repositories.AccountRepository
 import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
@@ -61,10 +61,11 @@ class UserController(private val accountRepository: AccountRepository) {
      */
     @PostMapping
     fun createAccount(@RequestBody request: NewAccount): ResponseEntity<ProfileResponse> {
-        val newUser = (SavedUser(
+        val newUser = (Account(
             userId = ObjectId(),
             username = request.username,
             email = request.email,
+            password = request.password,
             role = "unapproved",
             createdDate = LocalDateTime.now(),
             modifiedDate = LocalDateTime.now(),
@@ -81,10 +82,11 @@ class UserController(private val accountRepository: AccountRepository) {
     fun updateAccount(@RequestBody request: NewAccount, @PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
         val user = accountRepository.findOneByUserId(ObjectId(id))
 
-        val updatedUser = (SavedUser(
+        val updatedUser = (Account(
             userId = user.userId,
             username = request.username,
             email = request.email,
+            password = request.password,
             role = user.role,
             createdDate = user.createdDate,
             modifiedDate = LocalDateTime.now(),

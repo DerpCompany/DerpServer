@@ -2,7 +2,7 @@ package com.example.mongodb_server.integrationtests
 
 import com.example.mongodb_server.controllers.data.NewAccount
 import com.example.mongodb_server.controllers.data.ProfileResponse
-import com.example.mongodb_server.repositories.entities.SavedUser
+import com.example.mongodb_server.repositories.entities.Account
 import com.example.mongodb_server.repositories.AccountRepository
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.*
@@ -37,31 +37,31 @@ class UserControllerTests @Autowired constructor(
     private val accountRepository: AccountRepository, private val restTemplate: TestRestTemplate
 ) {
     // SETUP
-    private val testUser1 = SavedUser(
+    private val testUser1 = Account(
         ObjectId(), "empathyawaits", "empathyawaits@gmail.com", "admin", LocalDateTime
             .now(), LocalDateTime.now()
     )
-    private val testUser2 = SavedUser(
+    private val testUser2 = Account(
         ObjectId(), "cramsan", "crams@gmail.com", "moderator", LocalDateTime
             .now(), LocalDateTime.now()
     )
-    private val testUser3 = SavedUser(
+    private val testUser3 = Account(
         ObjectId(), "hythloday", "hyth@gmail.com", "admin", LocalDateTime
             .now(), LocalDateTime.now()
     )
-    private val testUser4 = SavedUser(
+    private val testUser4 = Account(
         ObjectId(), "taco", "taco@gmail.com", "moderator", LocalDateTime
             .now(), LocalDateTime.now()
     )
-    private val testUser5 = SavedUser(
+    private val testUser5 = Account(
         ObjectId(), "animus", "animus@gmail.com", "admin", LocalDateTime
             .now(), LocalDateTime.now()
     )
-    private val testUser6 = SavedUser(
+    private val testUser6 = Account(
         ObjectId(), "jouhou", "houjou@gmail.com", "admin", LocalDateTime
             .now(), LocalDateTime.now()
     )
-    private val testUser7 = SavedUser(
+    private val testUser7 = Account(
         ObjectId(), "steely", "wools@gmail.com", "member", LocalDateTime
             .now(), LocalDateTime.now()
     )
