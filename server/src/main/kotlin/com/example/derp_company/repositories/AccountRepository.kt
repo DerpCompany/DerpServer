@@ -1,6 +1,6 @@
-package com.example.mongodb_server.repositories
+package com.example.derp_company.repositories
 
-import com.example.mongodb_server.repositories.entities.Account
+import com.example.derp_company.repositories.entities.Account
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 

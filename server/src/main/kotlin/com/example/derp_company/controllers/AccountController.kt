@@ -1,10 +1,10 @@
-package com.example.mongodb_server.controllers
+package com.example.derp_company.controllers
 
-import com.example.mongodb_server.controllers.data.*
-import com.example.mongodb_server.repositories.entities.Account
-import com.example.mongodb_server.repositories.AccountRepository
-import com.example.mongodb_server.repositories.ProfileRepository
-import com.example.mongodb_server.repositories.entities.Profile
+import com.example.derp_company.controllers.data.*
+import com.example.derp_company.repositories.entities.Account
+import com.example.derp_company.repositories.AccountRepository
+import com.example.derp_company.repositories.ProfileRepository
+import com.example.derp_company.repositories.entities.Profile
 import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

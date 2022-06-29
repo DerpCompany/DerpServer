@@ -1,12 +1,11 @@
-package com.example.mongodb_server.integrationtests.controllers
+package com.example.derp_company.integrationtests.controllers
 
-import com.example.mongodb_server.controllers.data.AccountRequest
-import com.example.mongodb_server.controllers.data.AccountResponse
-import com.example.mongodb_server.controllers.data.ProfileResponse
-import com.example.mongodb_server.repositories.entities.Account
-import com.example.mongodb_server.repositories.AccountRepository
-import com.example.mongodb_server.repositories.ProfileRepository
-import com.example.mongodb_server.repositories.entities.Profile
+import com.example.derp_company.controllers.data.AccountRequest
+import com.example.derp_company.controllers.data.AccountResponse
+import com.example.derp_company.repositories.entities.Account
+import com.example.derp_company.repositories.AccountRepository
+import com.example.derp_company.repositories.ProfileRepository
+import com.example.derp_company.repositories.entities.Profile
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach

@@ -1,9 +1,8 @@
-package com.example.mongodb_server.controllers
+package com.example.derp_company.controllers
 
-import com.example.mongodb_server.controllers.data.ProfileResponse
-import com.example.mongodb_server.controllers.data.toProfileResponse
-import com.example.mongodb_server.repositories.ProfileRepository
-import com.example.mongodb_server.repositories.entities.Profile
+import com.example.derp_company.controllers.data.ProfileResponse
+import com.example.derp_company.controllers.data.toProfileResponse
+import com.example.derp_company.repositories.ProfileRepository
 import org.bson.types.ObjectId
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping

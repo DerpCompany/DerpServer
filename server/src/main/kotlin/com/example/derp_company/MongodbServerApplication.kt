@@ -1,4 +1,4 @@
-package com.example.mongodb_server
+package com.example.derp_company
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

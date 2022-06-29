@@ -1,4 +1,4 @@
-package com.example.mongodb_server
+package com.example.derp_company
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
