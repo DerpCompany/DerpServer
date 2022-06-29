@@ -5,6 +5,8 @@ import com.example.mongodb_server.controllers.data.AccountResponse
 import com.example.mongodb_server.controllers.data.ProfileResponse
 import com.example.mongodb_server.repositories.entities.Account
 import com.example.mongodb_server.repositories.AccountRepository
+import com.example.mongodb_server.repositories.ProfileRepository
+import com.example.mongodb_server.repositories.entities.Profile
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -33,17 +35,26 @@ import java.time.LocalDateTime
 @ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountControllerTests @Autowired constructor(
-    private val accountRepository: AccountRepository, private val restTemplate: TestRestTemplate
+    private val accountRepository: AccountRepository, private val profileRepository: ProfileRepository, private val
+    restTemplate: TestRestTemplate
 ) {
-    // SETUP
+    // SETUP - create the accounts and their respective profiles
+    private val testId1 = ObjectId()
+    private val testId2 = ObjectId()
+
     private val testAccount1 = Account(
-        ObjectId(), "empathyawaits", "empathyawaits@gmail.com", "admin", "test1234", LocalDateTime
+        testId1, "empathyawaits", "empathyawaits@gmail.com", "admin", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
+    private val testProfile1 = Profile(
+        testId1, testAccount1.username, testAccount1.email, testAccount1.role)
+
     private val testAccount2 = Account(
-        ObjectId(), "cramsan", "crams@gmail.com", "moderator", "test1234", LocalDateTime
+        testId2, "cramsan", "crams@gmail.com", "moderator", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
+    private val testProfile2 = Profile(
+        testId2, testAccount2.username, testAccount2.email, testAccount2.role)
 
     @LocalServerPort
     protected var port: Int = 0
@@ -59,7 +70,9 @@ class AccountControllerTests @Autowired constructor(
 
     private fun saveAccounts() {
         accountRepository.save(testAccount1)
+        profileRepository.save(testProfile1)
         accountRepository.save(testAccount2)
+        profileRepository.save(testProfile2)
     }
 
     @Test
