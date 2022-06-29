@@ -8,18 +8,52 @@ import com.example.derp_company.repositories.entities.Profile
 import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 
 @RestController
 @RequestMapping ("/api")
 class AccountController(private val accountRepository: AccountRepository, private val profileRepository: ProfileRepository) {
+    /**
+     * Query all profiles.
+     */
+    @GetMapping("/account")
+    fun getAllAccounts(): ResponseEntity<List<AccountResponse>> {
+        val profiles = accountRepository.findAll().map { it.toAccountResponse() }
+
+        return ResponseEntity.ok(profiles)
+    }
+
+    /**
+     * Query profile by ID.
+     */
+    @GetMapping("/account/{id}")
+    fun getOneAccountById(@PathVariable("id") id: String): ResponseEntity<AccountResponse> {
+        val profile = accountRepository.findOneByAccountId(ObjectId(id)).toAccountResponse()
+
+        return ResponseEntity.ok(profile)
+    }
+
+    /**
+     * Query profile by username.
+     */
+    @GetMapping("/account/username/{username}")
+    fun getOneAccountByUsername(@PathVariable("username") username: String): ResponseEntity<AccountResponse> {
+        val profile = accountRepository.findByUsername(username).toAccountResponse()
+
+        return ResponseEntity.ok(profile)
+    }
+
+    /**
+     * Query all profiles with specific role
+     */
+    @GetMapping("/account/role/{role}")
+    fun getAccountsByRole(@PathVariable("role") role: String): ResponseEntity<List<AccountResponse>> {
+        val profiles = accountRepository.findByRole(role).map { it.toAccountResponse() }
+
+        return ResponseEntity.ok(profiles)
+    }
+
     /**
      * Create new  account
      */

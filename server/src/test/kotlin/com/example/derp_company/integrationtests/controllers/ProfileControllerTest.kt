@@ -126,7 +126,7 @@ class ProfileControllerTest @Autowired constructor(
     }
 
     @ParameterizedTest
-    @CsvFileSource(resources = ["/getProfilesByRoleTests.csv"], numLinesToSkip = 1)
+    @CsvFileSource(resources = ["/getByRolesTests.csv"], numLinesToSkip = 1)
     fun `should return a list of profiles with the same role`(role: String, expected: Int) {
         // WHEN
         saveProfile()

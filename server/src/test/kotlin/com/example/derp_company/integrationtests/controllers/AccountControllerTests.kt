@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvFileSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -55,6 +57,27 @@ class AccountControllerTests @Autowired constructor(
     private val testProfile2 = Profile(
         testId2, testAccount2.username, testAccount2.email, testAccount2.role)
 
+    private val testAccount3 = Account(
+        ObjectId(), "hythloday", "hyth@gmail.com", "admin", "test1234", LocalDateTime
+            .now(), LocalDateTime.now()
+    )
+    private val testAccount4 = Account(
+        ObjectId(), "taco", "taco@gmail.com", "moderator", "test1234", LocalDateTime
+            .now(), LocalDateTime.now()
+    )
+    private val testAccount5 = Account(
+        ObjectId(), "animus", "animus@gmail.com", "admin", "test1234", LocalDateTime
+            .now(), LocalDateTime.now()
+    )
+    private val testAccount6 = Account(
+        ObjectId(), "jouhou", "houjou@gmail.com", "admin", "test1234", LocalDateTime
+            .now(), LocalDateTime.now()
+    )
+    private val testAccount7 = Account(
+        ObjectId(), "steely", "wools@gmail.com", "member", "test1234", LocalDateTime
+            .now(), LocalDateTime.now()
+    )
+
     @LocalServerPort
     protected var port: Int = 0
 
@@ -72,6 +95,83 @@ class AccountControllerTests @Autowired constructor(
         profileRepository.save(testProfile1)
         accountRepository.save(testAccount2)
         profileRepository.save(testProfile2)
+        accountRepository.save(testAccount3)
+        accountRepository.save(testAccount4)
+        accountRepository.save(testAccount5)
+        accountRepository.save(testAccount6)
+        accountRepository.save(testAccount7)
+    }
+
+    // TESTS
+    @Test
+    fun `should return all accounts`() {
+        // WHEN
+        saveAccounts()
+
+        // DO
+        val response = restTemplate.getForEntity(
+            getRootUrl() + "/account",
+            List::class.java
+        )
+
+        // ASSERT
+        assertEquals(200, response.statusCode.value())
+        assertNotNull(response.body)
+        assertEquals(7, response.body?.size)
+    }
+
+    @Test
+    fun `should return single account by id`() {
+        // WHEN
+        saveAccounts()
+        val id = testAccount7.accountId
+
+        // DO
+        val response = restTemplate.getForEntity(
+            getRootUrl() + "/account/$id",
+            AccountResponse::class.java
+        )
+
+        // ASSERT
+        assertEquals(200, response.statusCode.value())
+        assertNotNull(response.body)
+        assertEquals(id.toHexString(), response.body?.accountId)
+    }
+
+    @Test
+    fun `should return single account by username`() {
+        // WHEN
+        saveAccounts()
+        val username = testAccount3.username
+
+        // DO
+        val response = restTemplate.getForEntity(
+            getRootUrl() + "/account/username/$username",
+            AccountResponse::class.java
+        )
+
+        // ASSERT
+        assertEquals(200, response.statusCode.value())
+        assertNotNull(response.body)
+        assertEquals(username, response.body?.username)
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = ["/getByRolesTests.csv"], numLinesToSkip = 1)
+    fun `should return a list of accounts with the same role`(role: String, expected: Int) {
+        // WHEN
+        saveAccounts()
+
+        // DO
+        val response = restTemplate.getForEntity(
+            getRootUrl() + "/account/role/$role",
+            List::class.java
+        )
+
+        // ASSERT
+        assertEquals(200, response.statusCode.value())
+        assertNotNull(response.body)
+        assertEquals(expected, response.body?.size)
     }
 
     @Test
