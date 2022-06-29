@@ -38,31 +38,31 @@ class UserControllerTests @Autowired constructor(
 ) {
     // SETUP
     private val testUser1 = Account(
-        ObjectId(), "empathyawaits", "empathyawaits@gmail.com", "admin", LocalDateTime
+        ObjectId(), "empathyawaits", "empathyawaits@gmail.com", "admin", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testUser2 = Account(
-        ObjectId(), "cramsan", "crams@gmail.com", "moderator", LocalDateTime
+        ObjectId(), "cramsan", "crams@gmail.com", "moderator", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testUser3 = Account(
-        ObjectId(), "hythloday", "hyth@gmail.com", "admin", LocalDateTime
+        ObjectId(), "hythloday", "hyth@gmail.com", "admin", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testUser4 = Account(
-        ObjectId(), "taco", "taco@gmail.com", "moderator", LocalDateTime
+        ObjectId(), "taco", "taco@gmail.com", "moderator", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testUser5 = Account(
-        ObjectId(), "animus", "animus@gmail.com", "admin", LocalDateTime
+        ObjectId(), "animus", "animus@gmail.com", "admin", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testUser6 = Account(
-        ObjectId(), "jouhou", "houjou@gmail.com", "admin", LocalDateTime
+        ObjectId(), "jouhou", "houjou@gmail.com", "admin", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testUser7 = Account(
-        ObjectId(), "steely", "wools@gmail.com", "member", LocalDateTime
+        ObjectId(), "steely", "wools@gmail.com", "member", "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
 
@@ -165,11 +165,12 @@ class UserControllerTests @Autowired constructor(
         // WHEN
         val username = "steffybug"
         val email = "steffybug@gmail.com"
+        val password = "test1234"
 
         // DO
         val response = restTemplate.postForEntity(
             getRootUrl(),
-            NewAccount(username, email),
+            NewAccount(username, email, password),
             ProfileResponse::class.java
         )
 
@@ -188,13 +189,15 @@ class UserControllerTests @Autowired constructor(
         val userToUpdate = testUser2.userId
         val newUsername = "crams"
         val newEmail = "crasson@gmail.com"
+        val password = "test4321"
+
 
         // DO
         val response = restTemplate.exchange(
             getRootUrl() + "/$userToUpdate",
             HttpMethod.PUT,
             HttpEntity(
-                NewAccount(newUsername, newEmail),
+                NewAccount(newUsername, newEmail, password),
                 HttpHeaders(),
             ),
             ProfileResponse::class.java
