@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 @Document("account")
 data class Account (
     @Id
-    val userId: ObjectId,
+    val accountId: ObjectId,
     val username: String,
     val email: String,
     val role: String, // TODO: convert to ENUM

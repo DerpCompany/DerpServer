@@ -1,6 +1,6 @@
 package com.example.mongodb_server.integrationtests
 
-import com.example.mongodb_server.controllers.data.NewAccount
+import com.example.mongodb_server.controllers.data.AccountRequest
 import com.example.mongodb_server.controllers.data.ProfileResponse
 import com.example.mongodb_server.repositories.entities.Account
 import com.example.mongodb_server.repositories.AccountRepository
@@ -33,7 +33,7 @@ import java.time.LocalDateTime
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserControllerTests @Autowired constructor(
+class AccountControllerTests @Autowired constructor(
     private val accountRepository: AccountRepository, private val restTemplate: TestRestTemplate
 ) {
     // SETUP
@@ -110,7 +110,7 @@ class UserControllerTests @Autowired constructor(
     fun `should return single user by id`() {
         // WHEN
         saveUsers()
-        val userId = testUser7.userId
+        val userId = testUser7.accountId
 
         // DO
         val response = restTemplate.getForEntity(
@@ -170,7 +170,7 @@ class UserControllerTests @Autowired constructor(
         // DO
         val response = restTemplate.postForEntity(
             getRootUrl(),
-            NewAccount(username, email, password),
+            AccountRequest(username, email, password),
             ProfileResponse::class.java
         )
 
@@ -186,7 +186,7 @@ class UserControllerTests @Autowired constructor(
         // WHEN
         saveUsers()
 
-        val userToUpdate = testUser2.userId
+        val userToUpdate = testUser2.accountId
         val newUsername = "crams"
         val newEmail = "crasson@gmail.com"
         val password = "test4321"
@@ -197,7 +197,7 @@ class UserControllerTests @Autowired constructor(
             getRootUrl() + "/$userToUpdate",
             HttpMethod.PUT,
             HttpEntity(
-                NewAccount(newUsername, newEmail, password),
+                AccountRequest(newUsername, newEmail, password),
                 HttpHeaders(),
             ),
             ProfileResponse::class.java
@@ -214,7 +214,7 @@ class UserControllerTests @Autowired constructor(
     fun `should delete an existing account`() {
         // WHEN
         saveUsers()
-        val userToDelete = testUser4.userId
+        val userToDelete = testUser4.accountId
 
 
         // DO

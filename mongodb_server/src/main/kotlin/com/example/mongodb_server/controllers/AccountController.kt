@@ -17,52 +17,52 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 
 @RestController
-@RequestMapping ("/api/user")
-class UserController(private val accountRepository: AccountRepository) {
+@RequestMapping ("/api")
+class AccountController(private val accountRepository: AccountRepository) {
 
     /**
-     * Query all site users
+     * Query all profiles. Excludes passwords
      */
-    @GetMapping
-    fun getAllUsers(): ResponseEntity<List<ProfileResponse>> {
+    @GetMapping("/profile")
+    fun getAllProfiles(): ResponseEntity<List<ProfileResponse>> {
         val users = accountRepository.findAll().map { it.toProfileResponse() }
         return ResponseEntity.ok(users)
     }
 
     /**
-     * Query user by ID
+     * Query profile by ID. Excludes passwords
      */
-    @GetMapping("/id/{id}")
-    fun getOneUserByUserId(@PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
+    @GetMapping("/profile/{id}")
+    fun getOneProfileById(@PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
         val user = accountRepository.findOneByUserId(ObjectId(id)).toProfileResponse()
         return ResponseEntity.ok(user)
     }
 
     /**
-     * Query user by username
+     * Query user by username. Excludes passwords
      */
-    @GetMapping("/username/{username}")
-    fun getOneUserByUsername(@PathVariable("username") username: String): ResponseEntity<ProfileResponse> {
+    @GetMapping("/profile/username/{username}")
+    fun getOneProfileByUsername(@PathVariable("username") username: String): ResponseEntity<ProfileResponse> {
         val user = accountRepository.findByUsername(username).toProfileResponse()
         return ResponseEntity.ok(user)
     }
 
     /**
-     * Query all users with specific role
+     * Query all profiles with specific role. Excludes passwords
      */
-    @GetMapping("/roles/{role}")
-    fun getUsersByRoles(@PathVariable("role") role: String): ResponseEntity<List<ProfileResponse>> {
+    @GetMapping("/profile/role/{role}")
+    fun getProfilesByRole(@PathVariable("role") role: String): ResponseEntity<List<ProfileResponse>> {
         val users = accountRepository.findByRole(role).map { it.toProfileResponse() }
         return ResponseEntity.ok(users)
     }
 
     /**
-     * Create new user account
+     * Create new  account
      */
-    @PostMapping
-    fun createAccount(@RequestBody request: NewAccount): ResponseEntity<ProfileResponse> {
+    @PostMapping("/account")
+    fun createAccount(@RequestBody request: AccountRequest): ResponseEntity<ProfileResponse> {
         val newUser = (Account(
-            userId = ObjectId(),
+            accountId = ObjectId(),
             username = request.username,
             email = request.email,
             password = request.password,
@@ -78,12 +78,12 @@ class UserController(private val accountRepository: AccountRepository) {
     /**
      * Update an existing account
      */
-    @PutMapping("/{id}")
-    fun updateAccount(@RequestBody request: NewAccount, @PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
+    @PutMapping("/account/{id}")
+    fun updateAccount(@RequestBody request: AccountRequest, @PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
         val user = accountRepository.findOneByUserId(ObjectId(id))
 
         val updatedUser = (Account(
-            userId = user.userId,
+            accountId = user.accountId,
             username = request.username,
             email = request.email,
             password = request.password,
@@ -99,7 +99,7 @@ class UserController(private val accountRepository: AccountRepository) {
     /**
      * Delete an existing account
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/account/{id}")
     fun deleteAccount(@PathVariable("id") id: String): ResponseEntity<ProfileResponse> {
         accountRepository.deleteById(id)
         return ResponseEntity.noContent().build()
