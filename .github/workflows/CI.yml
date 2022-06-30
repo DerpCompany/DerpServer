@@ -33,4 +33,4 @@ jobs:
           distribution: zulu
 
       - name: Build with Gradle
-        run: cd ./server; ./gradlew build
+        run: ./gradlew build
