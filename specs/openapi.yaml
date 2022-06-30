@@ -1,0 +1,353 @@
+openapi: 3.0.2
+info:
+    title: GamingCommunityApi
+    version: 1.0.0
+    description: API for managing the members of the Derp Company website.
+    termsOfService: 'http://swagger.io/terms/'
+    contact:
+        name: '@gaaliciA1990'
+        url: 'https://github.com/DerpCompany/Derp_Site'
+    license:
+        name: Apache 2.0
+        url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+    /profile:
+        get:
+            responses:
+                '200':
+                    $ref: '#/components/responses/ProfileList'
+    '/profile/{id}':
+        get:
+            responses:
+                '200':
+                    $ref: '#/components/responses/Profile'
+        parameters:
+            -
+                name: id
+                schema:
+                    type: string
+                in: path
+                required: true
+    '/profile/username/{username}':
+        get:
+            responses:
+                '200':
+                    $ref: '#/components/responses/Profile'
+        parameters:
+            -
+                name: username
+                schema:
+                    type: string
+                in: path
+                required: true
+    /account:
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AccountRequest'
+                required: true
+            responses:
+                '200':
+                    $ref: '#/components/responses/Account'
+    '/profile/role/{roleId}':
+        get:
+            responses:
+                '200':
+                    $ref: '#/components/responses/ProfileList'
+        parameters:
+            -
+                name: roleId
+                schema:
+                    type: string
+                in: path
+                required: true
+    '/account/{id}':
+        put:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AccountRequest'
+                required: true
+            responses:
+                '200':
+                    $ref: '#/components/responses/Account'
+        delete:
+            responses:
+                '200':
+                    $ref: '#/components/responses/Outcome'
+        parameters:
+            -
+                name: id
+                schema:
+                    type: string
+                in: path
+                required: true
+    '/account/{id}/role':
+        put:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ChangeRoleRequest'
+                required: true
+            responses:
+                '200':
+                    $ref: '#/components/responses/Account'
+        parameters:
+            -
+                name: id
+                in: path
+                required: true
+    /subrole:
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SubRoleRequest'
+                required: true
+            responses:
+                '200':
+                    $ref: '#/components/responses/SubRole'
+    '/subrole/{id}':
+        put:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SubRoleRequest'
+                required: true
+            responses:
+                '200':
+                    $ref: '#/components/responses/SubRole'
+        delete:
+            responses:
+                '200':
+                    $ref: '#/components/responses/Outcome'
+        parameters:
+            -
+                name: id
+                in: path
+                required: true
+    '/profile/subrole/{subRoleId}/':
+        get:
+            responses:
+                '200':
+                    $ref: '#/components/responses/ProfileList'
+        parameters:
+            -
+                name: subRoleId
+                schema:
+                    type: string
+                in: path
+                required: true
+    '/subrole/{id}/profile/{profileId}':
+        put:
+            responses:
+                '200':
+                    $ref: '#/components/responses/Outcome'
+        delete:
+            responses:
+                '200':
+                    $ref: '#/components/responses/Outcome'
+        parameters:
+            -
+                name: id
+                in: path
+                required: true
+            -
+                name: profileId
+                in: path
+                required: true
+components:
+    schemas:
+        Account:
+            title: Root Type for Account
+            description: Account
+            required:
+                - email
+                - id
+                - role
+                - username
+            type: object
+            properties:
+                id:
+                    type: string
+                username:
+                    type: string
+                email:
+                    type: string
+                role:
+                    $ref: '#/components/schemas/Role'
+            example:
+                id: '784823476234876'
+                username: username
+                email: user@domain.com
+                role: ADMIN
+        Profile:
+            description: Public Profile for a user.
+            required:
+                - id
+                - username
+                - avatar_url
+                - bio
+                - last_updated
+                - joined
+            type: object
+            properties:
+                id:
+                    description: ''
+                    type: string
+                username:
+                    description: ''
+                    type: string
+                avatar_url:
+                    description: ''
+                    type: string
+                bio:
+                    description: ''
+                    type: string
+                last_updated:
+                    format: int32
+                    description: ''
+                    type: integer
+                joined:
+                    format: int32
+                    description: ''
+                    type: integer
+            example:
+                id: '34345457567'
+                username: username
+                avatar_url: 'https://www.test.com/img.jpg'
+                bio: This is an example
+                last_updated: 2942343243242
+                joined: 32423432434
+        SubRole:
+            title: Root Type for SubRole
+            description: ''
+            required:
+                - permissions
+            type: object
+            properties:
+                roleId:
+                    type: string
+                permissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Permissions'
+            example:
+                roleId: '32498234'
+                permissions:
+                    - BAN
+        AccountRequest:
+            title: Root Type for AccountRequest
+            description: ''
+            required:
+                - email
+                - id
+                - role
+                - username
+                - password
+            type: object
+            properties:
+                id:
+                    type: string
+                username:
+                    type: string
+                email:
+                    type: string
+                role:
+                    $ref: '#/components/schemas/Role'
+                password:
+                    description: ''
+                    type: string
+            example:
+                id: '784823476234876'
+                username: username
+                password: password123
+                email: user@domain.com
+                role: ADMIN
+        Outcome:
+            required:
+                - code
+                - message
+            properties:
+                code:
+                    format: int32
+                    type: integer
+                message:
+                    type: string
+        ChangeRoleRequest:
+            title: Root Type for ChangeRoleRequest
+            description: ''
+            required:
+                - role
+            type: object
+            properties:
+                role:
+                    $ref: '#/components/schemas/Role'
+            example:
+                role: MEMBER
+        Role:
+            enum:
+                - PENDING_APPROVAL
+                - MEMBER
+                - STAFF
+                - ADMIN
+            type: string
+        SubRoleRequest:
+            title: Root Type for SubRole
+            description: A subrole that allows to add permissions to a user.
+            required:
+                - permissions
+            type: object
+            properties:
+                permissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Permissions'
+            example:
+                permissions:
+                    - BAN
+        Permissions:
+            enum:
+                - BAN
+                - UNBAN
+            type: string
+    responses:
+        ProfileList:
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/components/schemas/Profile'
+            description: ''
+        Profile:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Profile'
+            description: ''
+        Account:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Account'
+            description: ''
+        Outcome:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Outcome'
+            description: ''
+        SubRole:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/SubRole'
+            description: ''
+
