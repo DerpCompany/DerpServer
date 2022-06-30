@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 @RequestMapping ("/api")
 class AccountController(private val accountRepository: AccountRepository, private val profileRepository: ProfileRepository) {
     /**
-     * Query all profiles.
+     * Query all accounts.
      */
     @GetMapping("/account")
     fun getAllAccounts(): ResponseEntity<List<AccountResponse>> {
@@ -35,7 +35,7 @@ class AccountController(private val accountRepository: AccountRepository, privat
     }
 
     /**
-     * Query profile by username.
+     * Query account by username.
      */
     @GetMapping("/account/username/{username}")
     fun getOneAccountByUsername(@PathVariable("username") username: String): ResponseEntity<AccountResponse> {
@@ -45,7 +45,7 @@ class AccountController(private val accountRepository: AccountRepository, privat
     }
 
     /**
-     * Query all profiles with specific role
+     * Query all accounts with specific role
      */
     @GetMapping("/account/role/{role}")
     fun getAccountsByRole(@PathVariable("role") role: String): ResponseEntity<List<AccountResponse>> {
@@ -55,7 +55,7 @@ class AccountController(private val accountRepository: AccountRepository, privat
     }
 
     /**
-     * Create new  account
+     * Create new account
      */
     @PostMapping("/account")
     fun createAccount(@RequestBody request: AccountRequest): ResponseEntity<AccountResponse> {

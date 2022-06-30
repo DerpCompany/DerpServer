@@ -1,4 +1,4 @@
-package com.example.derp_company.integrationtests.controllers
+package com.example.derp_company.integrationtests
 
 import com.example.derp_company.controllers.data.ProfileResponse
 import com.example.derp_company.repositories.AccountRepository
@@ -27,7 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ProfileControllerTest @Autowired constructor(
+class ProfileIntegrationTest @Autowired constructor(
     private val profileRepository: ProfileRepository,
     private val accountRepository: AccountRepository,
     private val restTemplate: TestRestTemplate

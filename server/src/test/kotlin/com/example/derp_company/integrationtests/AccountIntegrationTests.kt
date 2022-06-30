@@ -1,4 +1,4 @@
-package com.example.derp_company.integrationtests.controllers
+package com.example.derp_company.integrationtests
 
 import com.example.derp_company.controllers.data.AccountRequest
 import com.example.derp_company.controllers.data.AccountResponse
@@ -35,7 +35,7 @@ import java.time.LocalDateTime
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AccountControllerTests @Autowired constructor(
+class AccountIntegrationTests @Autowired constructor(
     private val accountRepository: AccountRepository, private val profileRepository: ProfileRepository, private val
     restTemplate: TestRestTemplate
 ) {
