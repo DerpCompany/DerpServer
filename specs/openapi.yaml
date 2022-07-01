@@ -100,6 +100,8 @@ paths:
             -
                 name: id
                 in: path
+                schema:
+                    type: string
                 required: true
     /subrole:
         post:
@@ -132,6 +134,8 @@ paths:
                 name: id
                 in: path
                 required: true
+                schema:
+                    type: string
     '/profile/subrole/{subRoleId}/':
         get:
             responses:
@@ -158,10 +162,14 @@ paths:
                 name: id
                 in: path
                 required: true
+                schema:
+                    type: string
             -
                 name: profileId
                 in: path
                 required: true
+                schema:
+                    type: string
 components:
     schemas:
         Account:

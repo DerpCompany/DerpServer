@@ -79,7 +79,7 @@ class AccountIntegrationTests @Autowired constructor(
     )
 
     @LocalServerPort
-    protected var port: Int = 0
+    private var port: Int = 0
 
     @BeforeEach
     fun setUp() {

@@ -12,6 +12,7 @@ plugins {
     id("io.spring.dependency-management")
     kotlin("plugin.spring")
     id("io.gitlab.arturbosch.detekt")
+    id("org.openapi.generator")
 }
 
 group = "com.derpcompany.server"
@@ -66,4 +67,20 @@ tasks.withType<Test> {
     testLogging {
         events(PASSED, FAILED, STANDARD_OUT, STANDARD_ERROR, SKIPPED)
     }
+}
+
+// Configure the tasks for OpenAPI
+val openApiSpec = "$rootDir/specs/openapi.yaml"
+openApiValidate {
+    inputSpec.set(openApiSpec)
+}
+
+// Validating a single specification
+openApiGenerate {
+    generatorName.set("html2")
+    inputSpec.set(openApiSpec)
+    outputDir.set("$buildDir/generated/openapi-spec")
+}
+tasks.compileJava {
+    dependsOn(tasks.openApiGenerate)
 }
