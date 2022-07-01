@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document
  */
 
 @Document("profile")
-data class Profile (
+data class Profile(
     @Id
     val profileId: ObjectId,
     val username: String,

@@ -1,20 +1,31 @@
 package com.derpcompany.server.controllers
 
-import com.derpcompany.server.controllers.data.*
+import com.derpcompany.server.controllers.data.AccountResponse
+import com.derpcompany.server.controllers.data.toAccountResponse
 import com.derpcompany.server.network.models.AccountRequest
-import com.derpcompany.server.repositories.entities.Account
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository
+import com.derpcompany.server.repositories.entities.Account
 import com.derpcompany.server.repositories.entities.Profile
 import org.bson.types.ObjectId
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 
 @RestController
-@RequestMapping ("/api")
-class AccountController(private val accountRepository: AccountRepository, private val profileRepository: ProfileRepository) {
+@RequestMapping("/api")
+class AccountController(
+    private val accountRepository: AccountRepository,
+    private val profileRepository: ProfileRepository,
+) {
     /**
      * Query all accounts.
      */
@@ -89,7 +100,10 @@ class AccountController(private val accountRepository: AccountRepository, privat
      * Update an existing account
      */
     @PutMapping("/account/{id}")
-    fun updateAccount(@RequestBody request: AccountRequest, @PathVariable("id") id: String): ResponseEntity<AccountResponse> {
+    fun updateAccount(
+        @RequestBody request: AccountRequest,
+        @PathVariable("id") id: String,
+    ): ResponseEntity<AccountResponse> {
         val account = accountRepository.findOneByAccountId(ObjectId(id))
         val profile = profileRepository.findOneByProfileId((ObjectId(id)))
 

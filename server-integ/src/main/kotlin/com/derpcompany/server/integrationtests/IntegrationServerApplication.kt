@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ComponentScan
 @ComponentScan("com.derpcompany.server")
 class IntegrationServerApplication
 
+@Suppress("SpreadOperator")
 fun main(args: Array<String>) {
     runApplication<IntegrationServerApplication>(*args)
 }

@@ -22,6 +22,6 @@ fun Account.toAccountResponse(): AccountResponse {
         email,
         role,
         createdDate = 0L,
-        modifiedDate = 0L
+        modifiedDate = 0L,
     )
 }

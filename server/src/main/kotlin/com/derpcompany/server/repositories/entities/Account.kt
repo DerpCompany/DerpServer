@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
 @Document("account")
-data class Account (
+data class Account(
     @Id
     val accountId: ObjectId,
     val username: String,

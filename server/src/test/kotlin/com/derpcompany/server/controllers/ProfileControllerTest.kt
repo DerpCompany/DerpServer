@@ -14,10 +14,8 @@ import org.junit.jupiter.api.Assertions.*
 internal class ProfileControllerTest {
 
     @BeforeEach
-    fun setUp() {
-    }
+    fun setUp() = Unit
 
     @AfterEach
-    fun tearDown() {
-    }
+    fun tearDown() = Unit
 }
