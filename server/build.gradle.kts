@@ -79,7 +79,7 @@ openApiValidate {
 openApiGenerate {
     generatorName.set("html2")
     inputSpec.set(openApiSpec)
-    outputDir.set("$buildDir/generated/openapi-spec")
+    outputDir.set("$rootDir/generated/openapi-spec")
 }
 tasks.compileJava {
     dependsOn(tasks.openApiGenerate)
