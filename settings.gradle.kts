@@ -9,3 +9,4 @@ rootProject.name = "derp_site"
 
 include(":server")
 include(":server-integ")
+include(":network-models")

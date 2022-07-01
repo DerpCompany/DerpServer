@@ -1,4 +1,4 @@
-package com.derpcompany.server.controllers.data
+package com.derpcompany.server.network.models
 
 /**
  * Author: garci
