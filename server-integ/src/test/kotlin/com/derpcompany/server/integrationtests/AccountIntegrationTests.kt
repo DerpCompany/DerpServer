@@ -1,7 +1,7 @@
 package com.derpcompany.server.integrationtests
 
-import com.derpcompany.server.controllers.data.AccountRequest
 import com.derpcompany.server.controllers.data.AccountResponse
+import com.derpcompany.server.network.models.AccountRequest
 import com.derpcompany.server.repositories.entities.Account
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository

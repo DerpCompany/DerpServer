@@ -1,3 +1,9 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT
+import org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
+import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
+
 plugins {
     kotlin("multiplatform")
 }
@@ -13,6 +19,10 @@ kotlin {
         withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
+
+            testLogging {
+                events(PASSED, FAILED, STANDARD_OUT, STANDARD_ERROR, SKIPPED)
+            }
         }
     }
     js(BOTH) {
