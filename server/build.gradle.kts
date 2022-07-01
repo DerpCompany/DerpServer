@@ -6,9 +6,9 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    kotlin("jvm")
     id("org.springframework.boot")
     id("io.spring.dependency-management")
-    kotlin("jvm")
     kotlin("plugin.spring")
 }
 
