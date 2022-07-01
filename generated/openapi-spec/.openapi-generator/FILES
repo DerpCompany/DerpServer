@@ -1,2 +1,12 @@
 .openapi-generator-ignore
-index.html
+Apis/DefaultApi.md
+Models/Account.md
+Models/AccountRequest.md
+Models/ChangeRoleRequest.md
+Models/Outcome.md
+Models/Permissions.md
+Models/Profile.md
+Models/Role.md
+Models/SubRole.md
+Models/SubRoleRequest.md
+README.md

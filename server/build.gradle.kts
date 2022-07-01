@@ -77,7 +77,7 @@ openApiValidate {
 
 // Validating a single specification
 openApiGenerate {
-    generatorName.set("html2")
+    generatorName.set("markdown")
     inputSpec.set(openApiSpec)
     outputDir.set("$rootDir/generated/openapi-spec")
 }
