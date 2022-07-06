@@ -37,7 +37,7 @@ class AccountController(
     }
 
     /**
-     * Query profile by ID.
+     * Query account by ID.
      */
     @GetMapping("/account/{id}")
     fun getOneAccountById(@PathVariable("id") id: String): ResponseEntity<AccountResponse> {
@@ -83,6 +83,7 @@ class AccountController(
             modifiedDate = LocalDateTime.now(),
         )
 
+        // create new profile with associated account
         val newProfile = Profile(
             profileId = id,
             username = request.username,
@@ -117,6 +118,7 @@ class AccountController(
             modifiedDate = LocalDateTime.now(),
         )
 
+        // Updated existing profile associated with account
         val updatedProfile = Profile(
             profileId = profile.profileId,
             username = request.username,
