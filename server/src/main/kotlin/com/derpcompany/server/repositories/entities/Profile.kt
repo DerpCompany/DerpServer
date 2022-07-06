@@ -1,5 +1,6 @@
 package com.derpcompany.server.repositories.entities
 
+import com.derpcompany.server.controllers.data.Roles
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -16,6 +17,6 @@ data class Profile(
     val profileId: ObjectId,
     val username: String,
     val email: String,
-    val role: String,
+    val role: Roles,
     // TODO: Add profileImg, Bio Description, etc
 )

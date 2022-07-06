@@ -1,4 +1,4 @@
 role, expected
-"admin", 4
-"moderator", 2
-"member", 1
+ADMIN, 4
+MODERATOR, 2
+MEMBER, 1

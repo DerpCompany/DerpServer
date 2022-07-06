@@ -1,6 +1,7 @@
 package com.derpcompany.server.controllers
 
 import com.derpcompany.server.controllers.data.ProfileResponse
+import com.derpcompany.server.controllers.data.Roles
 import com.derpcompany.server.controllers.data.toProfileResponse
 import com.derpcompany.server.repositories.ProfileRepository
 import org.bson.types.ObjectId
@@ -53,8 +54,8 @@ class ProfileController(private val profileRepository: ProfileRepository) {
      * Query all profiles with specific role
      */
     @GetMapping("/profile/role/{role}")
-    fun getProfilesByRole(@PathVariable("role") role: String): ResponseEntity<List<ProfileResponse>> {
-        val profiles = profileRepository.findByRole(role).map { it.toProfileResponse() }
+    fun getProfilesByRole(@PathVariable("role") role: Roles): ResponseEntity<List<ProfileResponse>> {
+        val profiles = profileRepository.findByRole(role.toString()).map { it.toProfileResponse() }
 
         return ResponseEntity.ok(profiles)
     }

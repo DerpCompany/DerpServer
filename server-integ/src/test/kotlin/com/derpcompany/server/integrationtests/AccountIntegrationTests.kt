@@ -1,6 +1,7 @@
 package com.derpcompany.server.integrationtests
 
 import com.derpcompany.server.controllers.data.AccountResponse
+import com.derpcompany.server.controllers.data.Roles
 import com.derpcompany.server.network.models.AccountRequest
 import com.derpcompany.server.repositories.entities.Account
 import com.derpcompany.server.repositories.AccountRepository
@@ -44,37 +45,37 @@ class AccountIntegrationTests @Autowired constructor(
     private val testId2 = ObjectId()
 
     private val testAccount1 = Account(
-        testId1, "empathyawaits", "empathyawaits@gmail.com", "admin", "test1234", LocalDateTime
+        testId1, "empathyawaits", "empathyawaits@gmail.com", Roles.ADMIN, "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testProfile1 = Profile(
         testId1, testAccount1.username, testAccount1.email, testAccount1.role)
 
     private val testAccount2 = Account(
-        testId2, "cramsan", "crams@gmail.com", "moderator", "test1234", LocalDateTime
+        testId2, "cramsan", "crams@gmail.com", Roles.MODERATOR, "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testProfile2 = Profile(
         testId2, testAccount2.username, testAccount2.email, testAccount2.role)
 
     private val testAccount3 = Account(
-        ObjectId(), "hythloday", "hyth@gmail.com", "admin", "test1234", LocalDateTime
+        ObjectId(), "hythloday", "hyth@gmail.com", Roles.ADMIN, "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testAccount4 = Account(
-        ObjectId(), "taco", "taco@gmail.com", "moderator", "test1234", LocalDateTime
+        ObjectId(), "taco", "taco@gmail.com", Roles.MODERATOR, "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testAccount5 = Account(
-        ObjectId(), "animus", "animus@gmail.com", "admin", "test1234", LocalDateTime
+        ObjectId(), "animus", "animus@gmail.com", Roles.ADMIN, "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testAccount6 = Account(
-        ObjectId(), "jouhou", "houjou@gmail.com", "admin", "test1234", LocalDateTime
+        ObjectId(), "jouhou", "houjou@gmail.com", Roles.ADMIN, "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
     private val testAccount7 = Account(
-        ObjectId(), "steely", "wools@gmail.com", "member", "test1234", LocalDateTime
+        ObjectId(), "steely", "wools@gmail.com", Roles.MEMBER, "test1234", LocalDateTime
             .now(), LocalDateTime.now()
     )
 
@@ -139,6 +140,23 @@ class AccountIntegrationTests @Autowired constructor(
     }
 
     @Test
+    fun `should return NOT FOUND for non-existent id`() {
+        // WHEN
+        saveAccounts()
+        val id = "62c5e04b123bb76da0731e32"
+
+        // DO
+        val response = restTemplate.getForEntity(
+            getRootUrl() + "/account/$id",
+            AccountResponse::class.java
+        )
+
+        // ASSERT
+        assertEquals(404, response.statusCode.value())
+        assertNull(response.body)
+    }
+
+    @Test
     fun `should return single account by username`() {
         // WHEN
         saveAccounts()
@@ -154,6 +172,23 @@ class AccountIntegrationTests @Autowired constructor(
         assertEquals(200, response.statusCode.value())
         assertNotNull(response.body)
         assertEquals(username, response.body?.username)
+    }
+
+    @Test
+    fun `should return NOT FOUND for non-existent username`() {
+        // WHEN
+        saveAccounts()
+        val username = "userDoesNotExist"
+
+        // DO
+        val response = restTemplate.getForEntity(
+            getRootUrl() + "/account/username/$username",
+            AccountResponse::class.java
+        )
+
+        // ASSERT
+        assertEquals(404, response.statusCode.value())
+        assertNull(response.body)
     }
 
     @ParameterizedTest

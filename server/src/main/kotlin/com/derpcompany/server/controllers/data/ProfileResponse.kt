@@ -6,7 +6,7 @@ data class ProfileResponse(
     val profileId: String,
     val username: String,
     val email: String,
-    val role: String, // TODO: convert to ENUM
+    val role: Roles, // TODO: convert to ENUM
 )
 
 /**

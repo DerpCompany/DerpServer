@@ -1,6 +1,7 @@
 package com.derpcompany.server.integrationtests
 
 import com.derpcompany.server.controllers.data.ProfileResponse
+import com.derpcompany.server.controllers.data.Roles
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository
 import com.derpcompany.server.repositories.entities.Profile
@@ -35,19 +36,19 @@ class ProfileIntegrationTest @Autowired constructor(
 ) {
     // SETUP
     private val testProfile1 = Profile(
-        ObjectId(), "empathyawaits", "empathyawaits@gmail.com", "admin")
+        ObjectId(), "empathyawaits", "empathyawaits@gmail.com", Roles.ADMIN)
     private val testProfile2 = Profile(
-        ObjectId(), "cramsan", "crams@gmail.com", "moderator")
+        ObjectId(), "cramsan", "crams@gmail.com", Roles.MODERATOR)
     private val testProfile3 = Profile(
-        ObjectId(), "hythloday", "hyth@gmail.com", "admin")
+        ObjectId(), "hythloday", "hyth@gmail.com", Roles.ADMIN)
     private val testProfile4 = Profile(
-        ObjectId(), "taco", "taco@gmail.com", "moderator")
+        ObjectId(), "taco", "taco@gmail.com", Roles.MODERATOR)
     private val testProfile5 = Profile(
-        ObjectId(), "animus", "animus@gmail.com", "admin")
+        ObjectId(), "animus", "animus@gmail.com", Roles.ADMIN)
     private val testProfile6 = Profile(
-        ObjectId(), "jouhou", "houjou@gmail.com", "admin")
+        ObjectId(), "jouhou", "houjou@gmail.com", Roles.ADMIN)
     private val testProfile7 = Profile(
-        ObjectId(), "steely", "wools@gmail.com", "member")
+        ObjectId(), "steely", "wools@gmail.com", Roles.MEMBER)
 
     @LocalServerPort
     private var port: Int = 0
