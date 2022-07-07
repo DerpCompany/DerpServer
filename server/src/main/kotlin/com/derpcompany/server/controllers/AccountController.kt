@@ -2,15 +2,8 @@ package com.derpcompany.server.controllers
 
 import com.derpcompany.server.controllers.data.AccountResponse
 import com.derpcompany.server.controllers.data.Roles
-import com.derpcompany.server.controllers.data.toAccountResponse
 import com.derpcompany.server.network.models.AccountRequest
-import com.derpcompany.server.repositories.AccountRepository
-import com.derpcompany.server.repositories.ProfileRepository
-import com.derpcompany.server.repositories.entities.Account
-import com.derpcompany.server.repositories.entities.Profile
 import com.derpcompany.server.services.AccountService
-import org.bson.types.ObjectId
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,12 +13,11 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api")
 class AccountController(
-    private val accountService: AccountService
+    private val accountService: AccountService,
 ) {
     /**
      * Query all accounts.
@@ -64,7 +56,7 @@ class AccountController(
      */
     @PostMapping("/account")
     fun createAccount(@RequestBody request: AccountRequest): ResponseEntity<AccountResponse> {
-       return accountService.createAccount(request)
+        return accountService.createAccount(request)
     }
 
     /**

@@ -40,7 +40,7 @@ class AccountService(
      * Service for querying an account with a validated ID
      */
     fun getOneAccountById(id: String): ResponseEntity<AccountResponse> {
-        var account:AccountResponse?
+        var account: AccountResponse?
 
         if (!validIDCheck(id)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -107,7 +107,7 @@ class AccountService(
         return ResponseEntity(newAccount.toAccountResponse(), HttpStatus.CREATED)
     }
 
-    fun updateAccount(request: AccountRequest, id: String,): ResponseEntity<AccountResponse> {
+    fun updateAccount(request: AccountRequest, id: String): ResponseEntity<AccountResponse> {
         val account = accountRepository.findOneByAccountId(ObjectId(id))
         val profile = profileRepository.findOneByProfileId((ObjectId(id)))
 
@@ -147,14 +147,14 @@ class AccountService(
      */
     private fun validIDCheck(id: String): Boolean {
         val minLength = 1
-        val maxLength = 25
+        val maxLength = MAX_ID_LENGTH
 
         // validate id isn't null or empty/blank
         if (id.isBlank()) {
             return false
         }
 
-        id.trim() //trim leading and trailing spaces
+        id.trim() // trim leading and trailing spaces
 
         // validate length
         if (id.length < minLength || id.length > maxLength) {
@@ -174,16 +174,16 @@ class AccountService(
     /**
      * Validate the Username meets our reqs
      */
-    private fun validUsernameCheck(username:String): Boolean {
+    private fun validUsernameCheck(username: String): Boolean {
         val minLength = 2
-        val maxLength = 18
+        val maxLength = MAX_USERNAME_LENGTH
 
         // validate username isn't null or empty/blank
         if (username.isBlank()) {
             return false
         }
 
-        username.trim() //trim leading and trailing spaces
+        username.trim() // trim leading and trailing spaces
 
         // validate username length
         if (username.length < minLength || username.length > maxLength) {
@@ -198,4 +198,8 @@ class AccountService(
         return true
     }
 
+    companion object {
+        private const val MAX_ID_LENGTH = 25
+        private const val MAX_USERNAME_LENGTH = 18
+    }
 }
