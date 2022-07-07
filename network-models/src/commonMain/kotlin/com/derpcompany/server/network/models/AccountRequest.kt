@@ -8,7 +8,7 @@ package com.derpcompany.server.network.models
  * Data we expect from the site user in the body of the request
  */
 
-class AccountRequest (
+data class AccountRequest (
     val username: String,
     val email: String,
     val password: String,
