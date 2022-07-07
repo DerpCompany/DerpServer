@@ -27,11 +27,12 @@ kotlin {
             }
         }
     }
-    js(BOTH) {
+    js(IR) {
         browser {
             commonWebpackConfig {
                 cssSupport.enabled = true
             }
+            binaries.executable()
         }
     }
     sourceSets {
