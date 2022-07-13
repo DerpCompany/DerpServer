@@ -1,4 +1,4 @@
-package com.derpcompany.server.network.models
+package com.derpcompany.server.network.wiretypes
 
 /**
  * Author: garci
@@ -6,7 +6,7 @@ package com.derpcompany.server.network.models
  * Date: 7/6/2022 14:07
  */
 
-enum class Roles {
+enum class RolesWireType {
     ADMIN,
     MODERATOR,
     VOLUNTEER,

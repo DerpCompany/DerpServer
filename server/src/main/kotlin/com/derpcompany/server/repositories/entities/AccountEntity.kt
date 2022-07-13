@@ -1,19 +1,22 @@
 package com.derpcompany.server.repositories.entities
 
-import com.derpcompany.server.network.models.Roles
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import java.time.LocalDateTime
 
+/**
+ * Representation of an Account in the repository layer.
+ *
+ * @author cramsan
+ */
 @Document("account")
-data class Account(
+data class AccountEntity(
     @Id
     val accountId: ObjectId,
     val username: String,
     val email: String,
     val role: Roles,
     val password: String,
-    val createdDate: LocalDateTime,
-    val modifiedDate: LocalDateTime,
+    val createdDate: Long,
+    val modifiedDate: Long,
 )

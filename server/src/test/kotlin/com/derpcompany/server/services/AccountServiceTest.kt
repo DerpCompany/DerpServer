@@ -1,23 +1,36 @@
 package com.derpcompany.server.services
 
-import com.derpcompany.server.controllers.data.AccountResponse
-import com.derpcompany.server.controllers.data.Roles
+import com.derpcompany.server.network.wiretypes.RolesWireType
+import com.derpcompany.server.helpers.testAccount1
+import com.derpcompany.server.helpers.testAccount2
+import com.derpcompany.server.helpers.testAccount3
+import com.derpcompany.server.helpers.testAccountEntity1
+import com.derpcompany.server.helpers.testAccountEntity2
+import com.derpcompany.server.helpers.testAccountEntity3
+import com.derpcompany.server.helpers.testAccountRequest2
+import com.derpcompany.server.helpers.testAccountRequest3
+import com.derpcompany.server.helpers.testProfileEntity2
+import com.derpcompany.server.helpers.testProfileEntity3
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository
-import com.derpcompany.server.repositories.entities.Account
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinFeature
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.derpcompany.server.repositories.entities.AccountEntity
+import com.derpcompany.server.repositories.entities.Roles
 import io.mockk.MockKAnnotations
 import io.mockk.every
-import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.impl.annotations.MockK
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.http.ResponseEntity
-import java.time.LocalDateTime
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvFileSource
+import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.http.HttpStatus
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 
 /**
  * Author: cramsan
@@ -27,29 +40,21 @@ import java.time.LocalDateTime
 
 internal class AccountServiceTest {
 
-    @RelaxedMockK
+    @MockK
     lateinit var accountRepository: AccountRepository
 
-    @RelaxedMockK
+    @MockK
     lateinit var profileRepository: ProfileRepository
 
     lateinit var service: AccountService
 
-    val mapper = ObjectMapper().registerModule(
-        KotlinModule.Builder()
-            .withReflectionCacheSize(512)
-            .configure(KotlinFeature.NullToEmptyCollection, false)
-            .configure(KotlinFeature.NullToEmptyMap, false)
-            .configure(KotlinFeature.NullIsSameAsDefault, false)
-            .configure(KotlinFeature.SingletonSupport, false)
-            .configure(KotlinFeature.StrictNullChecks, false)
-            .build()
-    )
+    lateinit var clock: Clock
 
     @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this)
-        service = AccountService(accountRepository, profileRepository)
+        clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+        service = AccountService(accountRepository, profileRepository, clock)
     }
 
     @AfterEach
@@ -65,61 +70,136 @@ internal class AccountServiceTest {
         val result = service.getAllAccounts()
 
         // ASSERT
-        assertEquals(ResponseEntity.ok(listOf(testAccount1, testAccount2, testAccount3)), result)
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(listOf(testAccount1, testAccount2, testAccount3), result.body)
     }
 
-    companion object {
-        val testAccountEntity1 = Account(
-            accountId = ObjectId.get(),
-            username = "test1",
-            email = "a@b.c",
-            role = Roles.ADMIN,
-            password = "pass1",
-            createdDate = LocalDateTime.now(),
-            modifiedDate = LocalDateTime.now(),
+    @Test
+    fun `should return single account by id`() {
+        // WHEN
+        every { accountRepository.findOneByAccountId(testAccountEntity1.accountId) } returns testAccountEntity1
+
+        // DO
+        val result = service.getOneAccountById(testAccount1.accountId)
+
+        // ASSERT
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(testAccount1, result.body)
+    }
+
+    @Test
+    fun `should return NOT FOUND for non-existent id`() {
+        // WHEN
+        every { accountRepository.findOneByAccountId(testAccountEntity1.accountId) } throws EmptyResultDataAccessException(1)
+
+        // DO
+        val result = service.getOneAccountById(testAccount1.accountId)
+
+        // ASSERT
+        assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+        assertFalse(result.hasBody())
+    }
+
+    @Test
+    fun `should return single account by username`() {
+        // WHEN
+        every { accountRepository.findByUsername(testAccount1.username) } returns testAccountEntity1
+
+        // DO
+        val result = service.getOneAccountByUsername(testAccount1.username)
+
+        // ASSERT
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(testAccount1, result.body)
+    }
+
+    @Test
+    fun `should return NOT FOUND for non-existent username`() {
+        // WHEN
+        every { accountRepository.findByUsername(testAccount1.username) } throws EmptyResultDataAccessException(1)
+
+        // DO
+        val result = service.getOneAccountByUsername(testAccount1.username)
+
+        // ASSERT
+        assertEquals(HttpStatus.NOT_FOUND, result.statusCode)
+        assertFalse(result.hasBody())
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = ["/getByRolesTests.csv"], numLinesToSkip = 1)
+    fun `should return a list of accounts with the same role`(role: String, index: Int) {
+        // WHEN
+        val accounts = listOf(
+            testAccount1,
+            testAccount2,
+            testAccount3
         )
-        val testAccountEntity2 = Account(
-            accountId = ObjectId.get(),
-            username = "test2",
-            email = "b@b.c",
-            role = Roles.MODERATOR,
-            password = "pass2",
-            createdDate = LocalDateTime.now(),
-            modifiedDate = LocalDateTime.now(),
-        )
-        val testAccountEntity3 = Account(
-            accountId = ObjectId.get(),
-            username = "test3",
-            email = "c@b.c",
-            role = Roles.MEMBER,
-            password = "pass3",
-            createdDate = LocalDateTime.now(),
-            modifiedDate = LocalDateTime.now(),
+        every { accountRepository.findByRole(RolesWireType.ADMIN.name) } returns listOf(testAccountEntity1)
+        every { accountRepository.findByRole(RolesWireType.MODERATOR.name) } returns listOf(testAccountEntity2)
+        every { accountRepository.findByRole(RolesWireType.MEMBER.name) } returns listOf(testAccountEntity3)
+
+        // DO
+        val result = service.getAccountsByRole(Roles.valueOf(role))
+
+        // ASSERT
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(1, result.body?.size)
+        assertEquals(accounts[index].accountId, result.body?.first()?.accountId)
+    }
+
+    @Test
+    fun `should create a new user account`() {
+        // WHEN
+        every { accountRepository.save(testAccountEntity2) } returns testAccountEntity2
+        every { profileRepository.save(testProfileEntity2) } returns testProfileEntity2
+
+        // DO
+        val result = service.createAccount(
+            username = testAccountRequest2.username,
+            email = testAccountRequest2.email,
+            password = testAccountRequest2.password,
         )
 
-        val testAccount1 = AccountResponse(
-            accountId = testAccountEntity1.accountId.toHexString(),
-            username = "test1",
-            email = "a@b.c",
-            role = Roles.ADMIN,
-            createdDate = 0,
-            modifiedDate = 0,
+        // ASSERT
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(testAccount2, result.body)
+    }
+
+    @Test
+    fun `should update an existing account `() {
+        // WHEN
+        val updatedPassword = "updatedPass"
+        val profileId = testProfileEntity2.profileId.toHexString()
+        val updatedAccountEntity = testAccountEntity3.copy(password = updatedPassword)
+        val updatedPasswordRequest = testAccountRequest3.copy(password = updatedPassword)
+        every { accountRepository.save(updatedAccountEntity) } returns updatedAccountEntity
+        every { profileRepository.save(testProfileEntity3) } returns testProfileEntity3
+
+        // DO
+        val result = service.updateAccount(
+            username = updatedPasswordRequest.username,
+            email = updatedPasswordRequest.email,
+            password = updatedPasswordRequest.password,
+            id = testAccount2.accountId,
         )
-        val testAccount2 = AccountResponse(
-            accountId = testAccountEntity2.accountId.toHexString(),
-            username = "test2",
-            email = "b@b.c",
-            role = Roles.MODERATOR,
-            createdDate = 0,
-            modifiedDate = 0,
-        )
-        val testAccount3 = AccountResponse(
-            accountId = testAccountEntity3.accountId.toHexString(),
-            username = "test3",
-            email = "c@b.c",
-            role = Roles.MEMBER,
-            createdDate = 0,
-            modifiedDate = 0,
-        )
+
+        // ASSERT
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(testAccount3, result.body)
+    }
+
+    @Test
+    fun `should delete an existing account`() {
+        // WHEN
+        every { accountRepository.deleteById(testAccount2.accountId) } returns Unit
+        every { profileRepository.deleteById(testAccount2.accountId) } returns Unit
+
+        // DO
+        val result = service.deleteAccount(testAccount2.accountId)
+
+        // ASSERT
+        assertEquals(HttpStatus.NO_CONTENT, result.statusCode)
+        assertFalse(result.hasBody())
     }
 }

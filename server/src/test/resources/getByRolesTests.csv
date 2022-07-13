@@ -1,4 +1,4 @@
-role, expected
+role, accountIndex
 ADMIN, 0
 MODERATOR, 1
 MEMBER, 2

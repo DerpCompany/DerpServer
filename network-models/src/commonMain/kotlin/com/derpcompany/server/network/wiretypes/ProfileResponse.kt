@@ -1,4 +1,4 @@
-package com.derpcompany.server.network.models
+package com.derpcompany.server.network.wiretypes
 
 /**
  * Author: garci
@@ -11,5 +11,5 @@ data class ProfileResponse(
     val profileId: String,
     val username: String,
     val email: String,
-    val role: Roles, // TODO: convert to ENUM
+    val role: RolesWireType,
 )

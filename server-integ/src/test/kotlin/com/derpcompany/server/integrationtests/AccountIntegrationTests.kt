@@ -1,12 +1,22 @@
 package com.derpcompany.server.integrationtests
 
-import com.derpcompany.server.network.models.AccountResponse
-import com.derpcompany.server.network.models.Roles
-import com.derpcompany.server.network.models.AccountRequest
-import com.derpcompany.server.repositories.entities.Account
+import com.derpcompany.server.integrationtests.helpers.testAccount1
+import com.derpcompany.server.integrationtests.helpers.testAccount2
+import com.derpcompany.server.integrationtests.helpers.testAccount3
+import com.derpcompany.server.integrationtests.helpers.testAccount4
+import com.derpcompany.server.integrationtests.helpers.testAccount5
+import com.derpcompany.server.integrationtests.helpers.testAccount6
+import com.derpcompany.server.integrationtests.helpers.testAccount7
+import com.derpcompany.server.integrationtests.helpers.testProfile1
+import com.derpcompany.server.integrationtests.helpers.testProfile2
+import com.derpcompany.server.network.wiretypes.AccountResponse
+import com.derpcompany.server.network.wiretypes.RolesWireType
+import com.derpcompany.server.network.wiretypes.AccountRequest
+import com.derpcompany.server.repositories.entities.AccountEntity
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository
-import com.derpcompany.server.repositories.entities.Profile
+import com.derpcompany.server.repositories.entities.ProfileEntity
+import com.derpcompany.server.repositories.entities.Roles
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -37,48 +47,11 @@ import java.time.LocalDateTime
 @ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountIntegrationTests @Autowired constructor(
-    private val accountRepository: AccountRepository, private val profileRepository: ProfileRepository, private val
-    restTemplate: TestRestTemplate
+    private val accountRepository: AccountRepository,
+    private val profileRepository: ProfileRepository,
+    private val restTemplate: TestRestTemplate,
 ) {
     // SETUP - create the accounts and their respective profiles
-    private val testId1 = ObjectId()
-    private val testId2 = ObjectId()
-
-    private val testAccount1 = Account(
-        testId1, "empathyawaits", "empathyawaits@gmail.com", Roles.ADMIN, "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testProfile1 = Profile(
-        testId1, testAccount1.username, testAccount1.email, testAccount1.role)
-
-    private val testAccount2 = Account(
-        testId2, "cramsan", "crams@gmail.com", Roles.MODERATOR, "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testProfile2 = Profile(
-        testId2, testAccount2.username, testAccount2.email, testAccount2.role)
-
-    private val testAccount3 = Account(
-        ObjectId(), "hythloday", "hyth@gmail.com", Roles.ADMIN, "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testAccount4 = Account(
-        ObjectId(), "taco", "taco@gmail.com", Roles.MODERATOR, "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testAccount5 = Account(
-        ObjectId(), "animus", "animus@gmail.com", Roles.ADMIN, "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testAccount6 = Account(
-        ObjectId(), "jouhou", "houjou@gmail.com", Roles.ADMIN, "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-    private val testAccount7 = Account(
-        ObjectId(), "steely", "wools@gmail.com", Roles.MEMBER, "test1234", LocalDateTime
-            .now(), LocalDateTime.now()
-    )
-
     @LocalServerPort
     private var port: Int = 0
 

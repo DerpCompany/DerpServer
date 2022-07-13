@@ -1,4 +1,4 @@
-package com.derpcompany.server.network.models
+package com.derpcompany.server.network.wiretypes
 
 /**
  * Author: garci

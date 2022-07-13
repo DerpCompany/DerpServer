@@ -1,10 +1,17 @@
 package com.derpcompany.server.integrationtests
 
-import com.derpcompany.server.network.models.ProfileResponse
-import com.derpcompany.server.network.models.Roles
+import com.derpcompany.server.integrationtests.helpers.testProfile1
+import com.derpcompany.server.integrationtests.helpers.testProfile2
+import com.derpcompany.server.integrationtests.helpers.testProfile3
+import com.derpcompany.server.integrationtests.helpers.testProfile4
+import com.derpcompany.server.integrationtests.helpers.testProfile5
+import com.derpcompany.server.integrationtests.helpers.testProfile6
+import com.derpcompany.server.integrationtests.helpers.testProfile7
+import com.derpcompany.server.network.wiretypes.ProfileResponse
+import com.derpcompany.server.network.wiretypes.RolesWireType
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository
-import com.derpcompany.server.repositories.entities.Profile
+import com.derpcompany.server.repositories.entities.ProfileEntity
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -34,20 +41,7 @@ class ProfileIntegrationTest @Autowired constructor(
     private val restTemplate: TestRestTemplate
 ) {
     // SETUP
-    private val testProfile1 = Profile(
-        ObjectId(), "empathyawaits", "empathyawaits@gmail.com", Roles.ADMIN)
-    private val testProfile2 = Profile(
-        ObjectId(), "cramsan", "crams@gmail.com", Roles.MODERATOR)
-    private val testProfile3 = Profile(
-        ObjectId(), "hythloday", "hyth@gmail.com", Roles.ADMIN)
-    private val testProfile4 = Profile(
-        ObjectId(), "taco", "taco@gmail.com", Roles.MODERATOR)
-    private val testProfile5 = Profile(
-        ObjectId(), "animus", "animus@gmail.com", Roles.ADMIN)
-    private val testProfile6 = Profile(
-        ObjectId(), "jouhou", "houjou@gmail.com", Roles.ADMIN)
-    private val testProfile7 = Profile(
-        ObjectId(), "steely", "wools@gmail.com", Roles.MEMBER)
+
 
     @LocalServerPort
     private var port: Int = 0

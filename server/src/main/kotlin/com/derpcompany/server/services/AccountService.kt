@@ -1,20 +1,19 @@
 package com.derpcompany.server.services
 
-import com.derpcompany.server.ConstantStrings
-import com.derpcompany.server.controllers.data.toAccountResponse
-import com.derpcompany.server.network.models.AccountRequest
-import com.derpcompany.server.network.models.AccountResponse
-import com.derpcompany.server.network.models.Roles
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository
-import com.derpcompany.server.repositories.entities.Account
-import com.derpcompany.server.repositories.entities.Profile
+import com.derpcompany.server.repositories.entities.AccountEntity
+import com.derpcompany.server.repositories.entities.ProfileEntity
+import com.derpcompany.server.repositories.entities.Roles
+import com.derpcompany.server.services.data.toAccount
+import com.derpcompany.server.services.models.Account
 import org.bson.types.ObjectId
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.Clock
+import java.time.Instant
 
 /**
  * Author: garci
@@ -28,6 +27,7 @@ import java.time.LocalDateTime
 class AccountService(
     private val accountRepository: AccountRepository,
     private val profileRepository: ProfileRepository,
+    private val clock: Clock,
 ) {
     /**
      * Constant values for validation checks
@@ -52,23 +52,23 @@ class AccountService(
     /**
      * Service for querying all accounts
      */
-    fun getAllAccounts(): ResponseEntity<List<AccountResponse>> {
-        val accounts = accountRepository.findAll().map { it.toAccountResponse() }
+    fun getAllAccounts(): ResponseEntity<List<Account>> {
+        val accounts = accountRepository.findAll().map { it.toAccount() }
         return ResponseEntity.ok(accounts)
     }
 
     /**
      * Service for querying an account with a validated ID
      */
-    fun getOneAccountById(id: String): ResponseEntity<AccountResponse> {
-        var account: AccountResponse?
+    fun getOneAccountById(id: String): ResponseEntity<Account> {
+        var account: Account?
 
         if (!validInputCheck(id, MAX_ID_LENGTH, MIN_ID_LENGTH)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
         try {
-            account = accountRepository.findOneByAccountId(ObjectId(id)).toAccountResponse()
+            account = accountRepository.findOneByAccountId(ObjectId(id)).toAccount()
         } catch (e: EmptyResultDataAccessException) {
             return ResponseEntity(HttpStatus.NOT_FOUND)
         }
@@ -79,15 +79,15 @@ class AccountService(
     /**
      * Service for querying an account with a validated username
      */
-    fun getOneAccountByUsername(username: String): ResponseEntity<AccountResponse> {
-        var account: AccountResponse?
+    fun getOneAccountByUsername(username: String): ResponseEntity<Account> {
+        var account: Account?
 
         if (!validInputCheck(username, MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
         try {
-            account = accountRepository.findByUsername(username).toAccountResponse()
+            account = accountRepository.findByUsername(username).toAccount()
         } catch (e: EmptyResultDataAccessException) {
             return ResponseEntity(HttpStatus.NOT_FOUND)
         }
@@ -98,8 +98,8 @@ class AccountService(
     /**
      * Service for querying all accounts with the same role
      */
-    fun getAccountsByRole(role: Roles): ResponseEntity<List<AccountResponse>> {
-        val accounts = accountRepository.findByRole(role.toString()).map { it.toAccountResponse() }
+    fun getAccountsByRole(role: Roles): ResponseEntity<List<Account>> {
+        val accounts = accountRepository.findByRole(role.toString()).map { it.toAccount() }
         return ResponseEntity.ok(accounts)
     }
 
@@ -107,52 +107,52 @@ class AccountService(
      * Service for creating a new account, which automatically creates a new profile associated
      * with the new account
      */
-    fun createAccount(request: AccountRequest): ResponseEntity<AccountResponse> {
+    fun createAccount(username: String, email: String, password: String): ResponseEntity<Account> {
         val id = ObjectId()
 
         // Validate request inputs
-        if (!validInputCheck(request.username, MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH)) {
+        if (!validInputCheck(username, MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
-        if (!validEmailCheck(request.email)) {
+        if (!validEmailCheck(email)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
-        if (!validPasswordCheck(request.password)) {
+        if (!validPasswordCheck(password)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
         // Create account and details
-        val newAccount = Account(
+        val newAccount = AccountEntity(
             accountId = id,
-            username = request.username,
-            email = request.email,
-            password = request.password,
+            username = username,
+            email = email,
+            password = password,
             role = Roles.UNAPPROVED,
-            createdDate = LocalDateTime.now(),
-            modifiedDate = LocalDateTime.now(),
+            createdDate = Instant.now(clock).toEpochMilli(),
+            modifiedDate = Instant.now(clock).toEpochMilli(),
         )
 
         // create new profile with associated account
-        val newProfile = Profile(
+        val newProfile = ProfileEntity(
             profileId = id,
-            username = request.username,
-            email = request.email,
+            username = username,
+            email = email,
             role = Roles.UNAPPROVED,
         )
 
         accountRepository.save(newAccount)
         profileRepository.save(newProfile)
 
-        return ResponseEntity(newAccount.toAccountResponse(), HttpStatus.CREATED)
+        return ResponseEntity(newAccount.toAccount(), HttpStatus.CREATED)
     }
 
     /**
      * Service for updating an existing account
      * TODO: Continue working on validating the account exists in the system
      */
-    fun updateAccount(request: AccountRequest, id: String): ResponseEntity<AccountResponse> {
+    fun updateAccount(username: String, email: String, password: String, id: String): ResponseEntity<Account> {
         // Validate request inputs
         if (validInputCheck(id, MAX_ID_LENGTH, MIN_PASSWORD_LENGTH)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -161,28 +161,28 @@ class AccountService(
         val account = accountRepository.findOneByAccountId(ObjectId(id))
         val profile = profileRepository.findOneByProfileId((ObjectId(id)))
 
-        val updatedAccount = Account(
+        val updatedAccount = AccountEntity(
             accountId = account.accountId,
-            username = request.username,
-            email = request.email,
+            username = username,
+            email = email,
             password = account.password,
             role = account.role,
             createdDate = account.createdDate,
-            modifiedDate = LocalDateTime.now(),
+            modifiedDate = Instant.now(clock).toEpochMilli(),
         )
 
         // Updated existing profile associated with account
-        val updatedProfile = Profile(
+        val updatedProfile = ProfileEntity(
             profileId = profile.profileId,
-            username = request.username,
-            email = request.email,
+            username = username,
+            email = email,
             role = profile.role,
         )
 
         accountRepository.save(updatedAccount)
         profileRepository.save(updatedProfile)
 
-        return ResponseEntity.ok(updatedAccount.toAccountResponse())
+        return ResponseEntity.ok(updatedAccount.toAccount())
     }
 
     /**
@@ -190,7 +190,7 @@ class AccountService(
      * TODO: verify the user owns the account (logged in), we can log to console/file the request, verify action
      * before proceeding
      */
-    fun deleteAccount(request: AccountRequest, id: String): ResponseEntity<AccountResponse> {
+    fun deleteAccount(id: String): ResponseEntity<Account> {
         accountRepository.deleteById(id)
         profileRepository.deleteById(id)
 
@@ -208,7 +208,7 @@ class AccountService(
             return false
         }
 
-        input.trim() //trim leading and trailing spaces
+        input.trim() // trim leading and trailing spaces
 
         // validate length
         if (input.length < minLength || input.length > maxLength) {
@@ -273,10 +273,5 @@ class AccountService(
         }
 
         return true
-    }
-
-    companion object {
-        private const val MAX_ID_LENGTH = 25
-        private const val MAX_USERNAME_LENGTH = 18
     }
 }

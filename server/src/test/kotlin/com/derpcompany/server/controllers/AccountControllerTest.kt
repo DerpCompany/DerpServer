@@ -1,9 +1,13 @@
 package com.derpcompany.server.controllers
 
-import com.derpcompany.server.controllers.data.AccountResponse
-import com.derpcompany.server.controllers.data.Roles
-import com.derpcompany.server.network.models.AccountRequest
+import com.derpcompany.server.network.wiretypes.RolesWireType
+import com.derpcompany.server.helpers.testAccount1
+import com.derpcompany.server.helpers.testAccount2
+import com.derpcompany.server.helpers.testAccount3
+import com.derpcompany.server.network.wiretypes.AccountRequest
+import com.derpcompany.server.network.wiretypes.AccountResponse
 import com.derpcompany.server.repositories.ProfileRepository
+import com.derpcompany.server.repositories.entities.Roles
 import com.derpcompany.server.services.AccountService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
@@ -170,7 +174,11 @@ internal class AccountControllerTest(@Autowired val mockMvc: MockMvc)  {
         // WHEN
         val accountRequest = AccountRequest(testAccount2.accountId, testAccount2.email, "password")
         val accountRequestAsString = mapper.writeValueAsString(accountRequest)
-        every { accountService.createAccount(accountRequest) } returns
+        every { accountService.createAccount(
+            username = accountRequest.username,
+            email = accountRequest.email,
+            password = accountRequest.password,
+        ) } returns
                 ResponseEntity(testAccount2, HttpStatus.CREATED)
 
         // DO
@@ -194,7 +202,12 @@ internal class AccountControllerTest(@Autowired val mockMvc: MockMvc)  {
         // WHEN
         val accountRequest = AccountRequest(testAccount2.accountId, testAccount2.email, "password2")
         val accountRequestAsString = mapper.writeValueAsString(accountRequest)
-        every { accountService.updateAccount(accountRequest, testAccount2.accountId) } returns
+        every { accountService.updateAccount(
+            username = accountRequest.username,
+            email = accountRequest.email,
+            password = accountRequest.password,
+            testAccount2.accountId,
+        ) } returns
                 ResponseEntity.ok(testAccount2)
 
         // DO
@@ -226,32 +239,5 @@ internal class AccountControllerTest(@Autowired val mockMvc: MockMvc)  {
 
         // ASSERT
         assert(result.response.contentAsString.isEmpty())
-    }
-
-    companion object {
-        val testAccount1 = AccountResponse(
-            accountId = "123abc",
-            username = "test1",
-            email = "a@b.c",
-            role = Roles.ADMIN,
-            createdDate = 200,
-            modifiedDate = 500,
-        )
-        val testAccount2 = AccountResponse(
-            accountId = "456def",
-            username = "test2",
-            email = "b@b.c",
-            role = Roles.MODERATOR,
-            createdDate = 300,
-            modifiedDate = 600,
-        )
-        val testAccount3 = AccountResponse(
-            accountId = "789ghi",
-            username = "test3",
-            email = "c@b.c",
-            role = Roles.MEMBER,
-            createdDate = 400,
-            modifiedDate = 700,
-        )
     }
 }
