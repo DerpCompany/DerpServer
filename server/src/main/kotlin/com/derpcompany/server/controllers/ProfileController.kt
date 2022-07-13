@@ -1,8 +1,8 @@
 package com.derpcompany.server.controllers
 
-import com.derpcompany.server.controllers.data.ProfileResponse
-import com.derpcompany.server.controllers.data.Roles
 import com.derpcompany.server.controllers.data.toProfileResponse
+import com.derpcompany.server.network.models.ProfileResponse
+import com.derpcompany.server.network.models.Roles
 import com.derpcompany.server.repositories.ProfileRepository
 import org.bson.types.ObjectId
 import org.springframework.http.ResponseEntity

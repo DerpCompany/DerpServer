@@ -1,6 +1,6 @@
 package com.derpcompany.server.repositories.entities
 
-import com.derpcompany.server.controllers.data.Roles
+import com.derpcompany.server.network.models.Roles
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document

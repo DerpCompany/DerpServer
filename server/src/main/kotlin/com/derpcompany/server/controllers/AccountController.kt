@@ -1,7 +1,7 @@
 package com.derpcompany.server.controllers
 
-import com.derpcompany.server.controllers.data.AccountResponse
-import com.derpcompany.server.controllers.data.Roles
+import com.derpcompany.server.network.models.AccountResponse
+import com.derpcompany.server.network.models.Roles
 import com.derpcompany.server.network.models.AccountRequest
 import com.derpcompany.server.services.AccountService
 import org.springframework.http.ResponseEntity
@@ -75,7 +75,8 @@ class AccountController(
      * TODO: Should have have a verification with a body request (AccountRequest)?
      */
     @DeleteMapping("/account/{id}")
-    fun deleteAccount(@PathVariable("id") id: String): ResponseEntity<AccountResponse> {
-        return accountService.deleteAccount(id)
+    fun deleteAccount(@RequestBody request: AccountRequest,
+                      @PathVariable("id") id: String): ResponseEntity<AccountResponse> {
+        return accountService.deleteAccount(request, id)
     }
 }

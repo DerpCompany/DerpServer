@@ -1,7 +1,7 @@
 package com.derpcompany.server.integrationtests
 
-import com.derpcompany.server.controllers.data.ProfileResponse
-import com.derpcompany.server.controllers.data.Roles
+import com.derpcompany.server.network.models.ProfileResponse
+import com.derpcompany.server.network.models.Roles
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository
 import com.derpcompany.server.repositories.entities.Profile
@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 /**

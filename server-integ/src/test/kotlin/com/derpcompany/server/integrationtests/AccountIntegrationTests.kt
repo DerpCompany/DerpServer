@@ -1,7 +1,7 @@
 package com.derpcompany.server.integrationtests
 
-import com.derpcompany.server.controllers.data.AccountResponse
-import com.derpcompany.server.controllers.data.Roles
+import com.derpcompany.server.network.models.AccountResponse
+import com.derpcompany.server.network.models.Roles
 import com.derpcompany.server.network.models.AccountRequest
 import com.derpcompany.server.repositories.entities.Account
 import com.derpcompany.server.repositories.AccountRepository
@@ -214,7 +214,7 @@ class AccountIntegrationTests @Autowired constructor(
         // WHEN
         val username = "steffybug"
         val email = "steffybug@gmail.com"
-        val password = "test1234"
+        val password = "tEst!1234"
 
         // DO
         val response = restTemplate.postForEntity(

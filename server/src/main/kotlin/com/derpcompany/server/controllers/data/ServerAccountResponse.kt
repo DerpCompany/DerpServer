@@ -1,15 +1,7 @@
 package com.derpcompany.server.controllers.data
 
+import com.derpcompany.server.network.models.AccountResponse
 import com.derpcompany.server.repositories.entities.Account
-
-data class AccountResponse(
-    val accountId: String,
-    val username: String,
-    val email: String,
-    val role: Roles, // TODO: convert to ENUM
-    val createdDate: Long,
-    val modifiedDate: Long,
-)
 
 /**
  * Shows the account details excluding sensitive data like password

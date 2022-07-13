@@ -1,9 +1,10 @@
 package com.derpcompany.server.services
 
-import com.derpcompany.server.controllers.data.AccountResponse
-import com.derpcompany.server.controllers.data.Roles
+import com.derpcompany.server.ConstantStrings
 import com.derpcompany.server.controllers.data.toAccountResponse
 import com.derpcompany.server.network.models.AccountRequest
+import com.derpcompany.server.network.models.AccountResponse
+import com.derpcompany.server.network.models.Roles
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository
 import com.derpcompany.server.repositories.entities.Account
@@ -29,6 +30,26 @@ class AccountService(
     private val profileRepository: ProfileRepository,
 ) {
     /**
+     * Constant values for validation checks
+     */
+    companion object {
+        private const val MAX_ID_LENGTH = 25
+        private const val MIN_ID_LENGTH = 1
+
+        private const val MAX_USERNAME_LENGTH = 18
+        private const val MIN_USERNAME_LENGTH = 2
+
+        private const val MAX_PASSWORD_LENGTH = 20
+        private const val MIN_PASSWORD_LENGTH = 8
+
+        private val emailPattern =
+            ("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
+                .toRegex()
+
+        private val passwordAcceptedSpecialChars = ("[!@#$^&*-?_`']").toRegex()
+    }
+
+    /**
      * Service for querying all accounts
      */
     fun getAllAccounts(): ResponseEntity<List<AccountResponse>> {
@@ -42,7 +63,7 @@ class AccountService(
     fun getOneAccountById(id: String): ResponseEntity<AccountResponse> {
         var account: AccountResponse?
 
-        if (!validIDCheck(id)) {
+        if (!validInputCheck(id, MAX_ID_LENGTH, MIN_ID_LENGTH)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
@@ -61,7 +82,7 @@ class AccountService(
     fun getOneAccountByUsername(username: String): ResponseEntity<AccountResponse> {
         var account: AccountResponse?
 
-        if (!validUsernameCheck(username)) {
+        if (!validInputCheck(username, MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
@@ -74,15 +95,35 @@ class AccountService(
         return ResponseEntity.ok(account)
     }
 
+    /**
+     * Service for querying all accounts with the same role
+     */
     fun getAccountsByRole(role: Roles): ResponseEntity<List<AccountResponse>> {
         val accounts = accountRepository.findByRole(role.toString()).map { it.toAccountResponse() }
-
         return ResponseEntity.ok(accounts)
     }
 
+    /**
+     * Service for creating a new account, which automatically creates a new profile associated
+     * with the new account
+     */
     fun createAccount(request: AccountRequest): ResponseEntity<AccountResponse> {
         val id = ObjectId()
 
+        // Validate request inputs
+        if (!validInputCheck(request.username, MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH)) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+
+        if (!validEmailCheck(request.email)) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+
+        if (!validPasswordCheck(request.password)) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+
+        // Create account and details
         val newAccount = Account(
             accountId = id,
             username = request.username,
@@ -107,7 +148,16 @@ class AccountService(
         return ResponseEntity(newAccount.toAccountResponse(), HttpStatus.CREATED)
     }
 
+    /**
+     * Service for updating an existing account
+     * TODO: Continue working on validating the account exists in the system
+     */
     fun updateAccount(request: AccountRequest, id: String): ResponseEntity<AccountResponse> {
+        // Validate request inputs
+        if (validInputCheck(id, MAX_ID_LENGTH, MIN_PASSWORD_LENGTH)) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+
         val account = accountRepository.findOneByAccountId(ObjectId(id))
         val profile = profileRepository.findOneByProfileId((ObjectId(id)))
 
@@ -135,7 +185,12 @@ class AccountService(
         return ResponseEntity.ok(updatedAccount.toAccountResponse())
     }
 
-    fun deleteAccount(id: String): ResponseEntity<AccountResponse> {
+    /**
+     * Service for deleting an existing account
+     * TODO: verify the user owns the account (logged in), we can log to console/file the request, verify action
+     * before proceeding
+     */
+    fun deleteAccount(request: AccountRequest, id: String): ResponseEntity<AccountResponse> {
         accountRepository.deleteById(id)
         profileRepository.deleteById(id)
 
@@ -143,55 +198,77 @@ class AccountService(
     }
 
     /**
-     * Validate the ID meets our reqs
+     * Validate the input meets our business logic of not being null,
+     * expected lengths, and doesn't contain spaces
      */
-    private fun validIDCheck(id: String): Boolean {
-        val minLength = 1
-        val maxLength = MAX_ID_LENGTH
+    private fun validInputCheck(input: String, maxLength: Int, minLength: Int): Boolean {
 
         // validate id isn't null or empty/blank
-        if (id.isBlank()) {
+        if (input.isBlank()) {
             return false
         }
 
-        id.trim() // trim leading and trailing spaces
+        input.trim() //trim leading and trailing spaces
 
         // validate length
-        if (id.length < minLength || id.length > maxLength) {
+        if (input.length < minLength || input.length > maxLength) {
             return false
         }
 
         // validate there are no spaces in the string
-        if (id.contains(" ")) {
+        if (input.contains(" ")) {
             return false
         }
-
-        // TODO: Add special char check
 
         return true
     }
 
     /**
-     * Validate the Username meets our reqs
+     * Validate a valid email has been entered
      */
-    private fun validUsernameCheck(username: String): Boolean {
-        val minLength = 2
-        val maxLength = MAX_USERNAME_LENGTH
-
-        // validate username isn't null or empty/blank
-        if (username.isBlank()) {
+    private fun validEmailCheck(email: String): Boolean {
+        // validate email isn't blank/empty
+        if (email.isBlank()) {
             return false
         }
 
-        username.trim() // trim leading and trailing spaces
+        email.trim()
 
-        // validate username length
-        if (username.length < minLength || username.length > maxLength) {
+        // return true/false if the email matches regex Patter for email
+        return emailPattern.matches(email)
+    }
+
+    /**
+     * Validate email is secure and meets min requirements
+     */
+    private fun validPasswordCheck(password: String): Boolean {
+        // validate password isn't blank/empty
+        if (password.isBlank()) {
             return false
         }
 
-        // validate there are no spaces in the string
-        if (username.contains(" ")) {
+        // validate password is within range
+        if (password.length < MIN_PASSWORD_LENGTH || password.length > MAX_PASSWORD_LENGTH) {
+            return false
+        }
+
+        // validate PW contains a lower case letter
+        if (!password.matches("[a-z]".toRegex())) {
+            return false
+        }
+
+        // validate PW contains a capital letter
+        if (!password.matches("[A-Z]".toRegex())) {
+            return false
+        }
+
+        // validate PW contains a number
+        if (!password.matches("\\d".toRegex())) {
+            return false
+        }
+
+        // validate PW contains an approved special char
+        if (!password.matches((passwordAcceptedSpecialChars))) {
             return false
         }
 

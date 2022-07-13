@@ -1,4 +1,4 @@
-package com.derpcompany.server.controllers.data
+package com.derpcompany.server.network.models
 
 /**
  * Author: garci
@@ -9,6 +9,7 @@ package com.derpcompany.server.controllers.data
 enum class Roles {
     ADMIN,
     MODERATOR,
+    VOLUNTEER,
     MEMBER,
     UNAPPROVED,
 }

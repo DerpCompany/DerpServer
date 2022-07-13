@@ -1,13 +1,8 @@
 package com.derpcompany.server.controllers.data
 
+import com.derpcompany.server.network.models.ProfileResponse
 import com.derpcompany.server.repositories.entities.Profile
 
-data class ProfileResponse(
-    val profileId: String,
-    val username: String,
-    val email: String,
-    val role: Roles, // TODO: convert to ENUM
-)
 
 /**
  * Shows the profile details
