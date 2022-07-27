@@ -37,7 +37,7 @@ dependencies, you may need to reimport your project. Try the following.
 - Close IntelliJ
 - Run the following commands:
   - `./gradlew --stop`
-  - `rm -.idea/`
+  - `rm -r .idea/`
   - `rm -r ~/.m2/`
   - `rm -r ~/.gradle/.tmp/ ~/.gradle/caches/`
 - Launch IntelliJ and open the project again. Now the classes should show up correctly.
