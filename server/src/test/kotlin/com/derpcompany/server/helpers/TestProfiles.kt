@@ -8,58 +8,58 @@ import com.derpcompany.server.services.models.Profile
 import org.bson.types.ObjectId
 
 val testProfileResponse1 = ProfileResponse(
-    profileId = "123abc",
+    profileId = "62ce572c5fa6d1270bd2ac43",
     username = "test1",
-    email = "a@b.c",
+    email = "simpleemamil@gamil.com",
     role = RolesWireType.ADMIN,
 )
 val testProfileResponse2 = ProfileResponse(
-    profileId = "456def",
+    profileId = "62ce572c5fa6d1270bd2ac44",
     username = "test2",
-    email = "b@b.c",
+    email = "testemail@hotmail.com",
     role = RolesWireType.MODERATOR,
 )
 val testProfileResponse3 = ProfileResponse(
-    profileId = "789ghi",
+    profileId = "62ce572c5fa6d1270bd2ac45",
     username = "test3",
-    email = "c@b.c",
+    email = "test2email@me.com",
     role = RolesWireType.MEMBER,
 )
 
 val testProfile1 = Profile(
-    profileId = "123abc",
+    profileId = "62ce572c5fa6d1270bd2ac43",
     username = "test1",
-    email = "a@b.c",
+    email = "simpleemamil@gamil.com",
     role = RolesWireType.ADMIN,
 )
 val testProfile2 = Profile(
-    profileId = "456def",
+    profileId = "62ce572c5fa6d1270bd2ac44",
     username = "test2",
-    email = "b@b.c",
+    email = "testemail@hotmail.com",
     role = RolesWireType.MODERATOR,
 )
 val testProfile3 = Profile(
-    profileId = "789ghi",
+    profileId = "62ce572c5fa6d1270bd2ac45",
     username = "test3",
-    email = "c@b.c",
+    email = "test2email@me.com",
     role = RolesWireType.MEMBER,
 )
 
 val testProfileEntity1 = ProfileEntity(
-    profileId = ObjectId.get(),
+    profileId = ObjectId("62ce572c5fa6d1270bd2ac43"),
     username = "test1",
-    email = "a@b.c",
+    email = "simpleemamil@gamil.com",
     role = Roles.ADMIN,
 )
 val testProfileEntity2 = ProfileEntity(
-    profileId = ObjectId.get(),
+    profileId = ObjectId("62ce572c5fa6d1270bd2ac44"),
     username = "test2",
-    email = "b@b.c",
+    email = "testemail@hotmail.com",
     role = Roles.MODERATOR,
 )
 val testProfileEntity3 = ProfileEntity(
-    profileId = ObjectId.get(),
+    profileId = ObjectId("62ce572c5fa6d1270bd2ac45"),
     username = "test3",
-    email = "c@b.c",
+    email = "test2email@me.com",
     role = Roles.MEMBER,
 )

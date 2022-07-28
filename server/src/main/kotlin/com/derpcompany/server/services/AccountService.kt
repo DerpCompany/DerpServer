@@ -169,7 +169,7 @@ class AccountService(
             accountId = account.accountId,
             username = username,
             email = email,
-            password = account.password,
+            password = password,
             role = account.role,
             createdDate = account.createdDate,
             modifiedDate = Instant.now(clock).toEpochMilli(),

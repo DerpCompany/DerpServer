@@ -13,8 +13,8 @@ import com.derpcompany.server.helpers.testProfileEntity2
 import com.derpcompany.server.helpers.testProfileEntity3
 import com.derpcompany.server.repositories.AccountRepository
 import com.derpcompany.server.repositories.ProfileRepository
-import com.derpcompany.server.repositories.entities.AccountEntity
 import com.derpcompany.server.repositories.entities.Roles
+import com.derpcompany.server.services.data.toAccount
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -169,13 +169,19 @@ internal class AccountServiceTest {
     fun `should update an existing account `() {
         // WHEN
         val updatedPassword = "updat3dPas&"
-        val profileId = testProfileEntity3.profileId.toHexString()
-        val updatedAccountEntity = testAccountEntity3.copy(password = updatedPassword)
+        val accountId = testAccount3.accountId
+
+        val updatedAccountEntity = testAccountEntity3.copy(
+            password = updatedPassword,
+            modifiedDate = clock.millis(),
+        )
         val updatedPasswordRequest = testAccountRequest3.copy(password = updatedPassword)
 
         every { accountRepository.save(updatedAccountEntity) } returns updatedAccountEntity
         every { profileRepository.save(testProfileEntity3) } returns testProfileEntity3
 
+        every { accountRepository.findOneByAccountId(ObjectId(accountId)) } returns testAccountEntity3
+        every { profileRepository.findOneByProfileId(ObjectId(accountId)) } returns testProfileEntity3
         // DO
         val result = service.updateAccount(
             username = updatedPasswordRequest.username,
@@ -186,7 +192,7 @@ internal class AccountServiceTest {
 
         // ASSERT
         assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(testAccount3, result.body)
+        assertEquals(updatedAccountEntity.toAccount(), result.body)
     }
 
     @Test
