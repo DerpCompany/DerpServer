@@ -158,7 +158,7 @@ class AccountService(
      */
     fun updateAccount(username: String, email: String, password: String, id: String): ResponseEntity<Account> {
         // Validate request inputs
-        if (validInputCheck(id, MAX_ID_LENGTH, MIN_PASSWORD_LENGTH)) {
+        if (!validInputCheck(id, MAX_ID_LENGTH, MIN_PASSWORD_LENGTH)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
