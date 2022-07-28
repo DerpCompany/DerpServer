@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.Clock
 import java.time.Instant
+import java.util.regex.Pattern
 
 /**
  * Author: garci
@@ -46,7 +47,10 @@ class AccountService(
             ("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
                 .toRegex()
 
-        private val passwordAcceptedSpecialChars = ("[!@#$^&*-?_`']").toRegex()
+        private val specialCharPattern: Pattern = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE)
+        private val upperCasePattern: Pattern = Pattern.compile("[A-Z ]")
+        private val lowerCasePattern: Pattern = Pattern.compile("[a-z ]")
+        private val digitCasePattern: Pattern = Pattern.compile("[0-9 ]")
     }
 
     /**
@@ -252,23 +256,22 @@ class AccountService(
             return false
         }
 
-        // validate PW contains a lower case letter
-        if (!password.matches("[a-z]".toRegex())) {
+        // validate PW contains an approved special char
+        if (!specialCharPattern.matcher(password).find()) {
             return false
         }
 
         // validate PW contains a capital letter
-        if (!password.matches("[A-Z]".toRegex())) {
+        if (!upperCasePattern.matcher(password).find()) {
+            return false
+        }
+        // validate PW contains a lower case letter
+        if (!lowerCasePattern.matcher(password).find()) {
             return false
         }
 
         // validate PW contains a number
-        if (!password.matches("\\d".toRegex())) {
-            return false
-        }
-
-        // validate PW contains an approved special char
-        if (!password.matches((passwordAcceptedSpecialChars))) {
+        if (!digitCasePattern.matcher(password).find()) {
             return false
         }
 

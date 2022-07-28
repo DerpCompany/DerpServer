@@ -150,9 +150,9 @@ internal class AccountServiceTest {
 
     @Test
     fun `should create a new user account`() {
-        // WHEN
-        every { accountRepository.save(testAccountEntity2) } returns testAccountEntity2
-        every { profileRepository.save(testProfileEntity2) } returns testProfileEntity2
+        // WHEN - whatever is passed is returned, since we're creating a new account
+        every { accountRepository.save(any()) } returns testAccountEntity2
+        every { profileRepository.save(any()) } returns testProfileEntity2
 
         // DO
         val result = service.createAccount(
@@ -162,17 +162,17 @@ internal class AccountServiceTest {
         )
 
         // ASSERT
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(testAccount2, result.body)
+        assertEquals(HttpStatus.CREATED, result.statusCode)
     }
 
     @Test
     fun `should update an existing account `() {
         // WHEN
-        val updatedPassword = "updatedPass"
+        val updatedPassword = "updat3dPas&"
         val profileId = testProfileEntity2.profileId.toHexString()
         val updatedAccountEntity = testAccountEntity3.copy(password = updatedPassword)
         val updatedPasswordRequest = testAccountRequest3.copy(password = updatedPassword)
+
         every { accountRepository.save(updatedAccountEntity) } returns updatedAccountEntity
         every { profileRepository.save(testProfileEntity3) } returns testProfileEntity3
 
