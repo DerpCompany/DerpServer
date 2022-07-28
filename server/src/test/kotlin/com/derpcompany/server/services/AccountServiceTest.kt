@@ -177,11 +177,13 @@ internal class AccountServiceTest {
         )
         val updatedPasswordRequest = testAccountRequest3.copy(password = updatedPassword)
 
+        // Mock the repository actions
         every { accountRepository.save(updatedAccountEntity) } returns updatedAccountEntity
         every { profileRepository.save(testProfileEntity3) } returns testProfileEntity3
 
         every { accountRepository.findOneByAccountId(ObjectId(accountId)) } returns testAccountEntity3
         every { profileRepository.findOneByProfileId(ObjectId(accountId)) } returns testProfileEntity3
+
         // DO
         val result = service.updateAccount(
             username = updatedPasswordRequest.username,
