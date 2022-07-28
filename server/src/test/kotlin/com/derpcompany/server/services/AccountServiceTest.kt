@@ -169,7 +169,7 @@ internal class AccountServiceTest {
     fun `should update an existing account `() {
         // WHEN
         val updatedPassword = "updat3dPas&"
-        val profileId = testProfileEntity2.profileId.toHexString()
+        val profileId = testProfileEntity3.profileId.toHexString()
         val updatedAccountEntity = testAccountEntity3.copy(password = updatedPassword)
         val updatedPasswordRequest = testAccountRequest3.copy(password = updatedPassword)
 
@@ -181,7 +181,7 @@ internal class AccountServiceTest {
             username = updatedPasswordRequest.username,
             email = updatedPasswordRequest.email,
             password = updatedPasswordRequest.password,
-            id = testAccount2.accountId,
+            id = testAccount3.accountId,
         )
 
         // ASSERT
