@@ -5,6 +5,7 @@ Derp Company website
 
 ![Coverage](.github/badges/jacoco.svg)
 
+
 Backend code written in Kotlin, with Sprint Boot.
 
 Frontend code written in Typescript, with Angular.
