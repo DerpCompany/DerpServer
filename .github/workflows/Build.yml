@@ -51,4 +51,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: jacoco-report
-          path: ./backend/chromeApiServer/target/site/jacoco/
+          path: ./server/build/reports/jacoco/test/
