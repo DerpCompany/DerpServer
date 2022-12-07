@@ -13,6 +13,7 @@ plugins {
     kotlin("plugin.spring")
     id("io.gitlab.arturbosch.detekt")
     id("org.openapi.generator")
+    jacoco
 }
 
 group = "com.derpcompany.server"
@@ -50,6 +51,14 @@ detekt {
     }
 }
 
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.required.set(true)
+    }
+}
+
 tasks.withType<Detekt>().configureEach {
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
@@ -70,6 +79,10 @@ tasks.withType<Test> {
     testLogging {
         events(PASSED, FAILED, STANDARD_OUT, STANDARD_ERROR, SKIPPED)
     }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
 
 // Configure the tasks for OpenAPI
