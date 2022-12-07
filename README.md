@@ -1,10 +1,11 @@
 # Derp_Site
 Derp Company website 
 
-[![Java CI with Gradle](https://github.com/DerpCompany/Derp_Site/actions/workflows/CI.yml/badge.svg)](https://github.com/DerpCompany/Derp_Site/actions/workflows/CI.yml)
+[![Build](https://github.com/DerpCompany/DerpServer/actions/workflows/Build.yml/badge.svg)](https://github.com/DerpCompany/DerpServer/actions/workflows/Build.yml)
 
-![Coverage](.github/badges/jacoco.svg)
+[![Integration Test](https://github.com/DerpCompany/DerpServer/actions/workflows/IntegrationTest.yml/badge.svg)](https://github.com/DerpCompany/DerpServer/actions/workflows/IntegrationTest.yml)
 
+![Code Coverage](.github/badges/jacoco.svg)
 
 Backend code written in Kotlin, with Sprint Boot.
 
