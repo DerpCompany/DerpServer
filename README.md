@@ -1,4 +1,4 @@
-# Derp_Site
+# Derp Server
 Derp Company website 
 
 [![Build](https://github.com/DerpCompany/DerpServer/actions/workflows/Build.yml/badge.svg)](https://github.com/DerpCompany/DerpServer/actions/workflows/Build.yml)
