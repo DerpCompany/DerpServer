@@ -22,6 +22,8 @@ version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 dependencies {
+    implementation("dev.kord:kord-core:0.8.0-M17")
+
     implementation(project(":network-models"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")

@@ -14,3 +14,7 @@ object ConstantStrings {
     const val INVALID_PASSWORD = "Oh Boy! That's not a good password!"
     const val INVALID_EMAILADDRESS = "Hmmm, that email doesn't look right..."
 }
+
+object Qualifiers {
+    const val SHUFFLE_BOT = "shuffleBot"
+}
