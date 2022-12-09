@@ -18,8 +18,8 @@ permissions:
 
 jobs:
   build:
-
     runs-on: self-hosted
+    environment: Deploy
 
     steps:
       - uses: actions/checkout@v3
@@ -34,3 +34,5 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          SHUFFLE_BOT_TOKEN: ${{ secrets.SHUFFLE_BOT }}
