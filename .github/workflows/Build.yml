@@ -16,7 +16,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    environment: Deploy
     steps:
       - uses: actions/checkout@v3
       - name: Set up the Java JDK
