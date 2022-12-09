@@ -29,7 +29,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew server:build
         env: # Or as an environment variable
-          SHUFFLE_BOT: ${{ secrets.SHUFFLE_BOT }}
+          SHUFFLE_BOT_TOKEN: ${{ secrets.SHUFFLE_BOT }}
       
       
       - name: Generate JaCoCo Badge
