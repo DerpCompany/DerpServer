@@ -17,6 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     environment: Deploy
+    
     steps:
       - uses: actions/checkout@v3
       - name: Set up the Java JDK
@@ -27,7 +28,10 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew server:build
-
+        env: # Or as an environment variable
+          SHUFFLE_BOT: ${{ secrets.SHUFFLE_BOT }}
+      
+      
       - name: Generate JaCoCo Badge
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v2
