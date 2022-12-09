@@ -47,7 +47,7 @@ jobs:
             git config --global user.name 'CI'
             git config --global user.email 'CI@derpcompany.com'
             git add .github/badges/jacoco.svg
-            git commit --amend
+            git commit --amend --no-edit
             git push
           fi
       - name: Upload JaCoCo coverage report
