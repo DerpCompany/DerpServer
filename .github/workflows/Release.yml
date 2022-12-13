@@ -33,11 +33,6 @@ jobs:
         env:
           SHUFFLE_BOT_TOKEN: ${{ secrets.SHUFFLE_BOT }}
 
-      - name: Build with Gradle
-        run: ./gradlew build
-        env:
-          SHUFFLE_BOT_TOKEN: ${{ secrets.SHUFFLE_BOT }}
-
       - name: Generate JaCoCo Badge
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v2
