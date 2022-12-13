@@ -19,6 +19,10 @@ jobs:
     environment: Deploy
     
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.ref_name }}
