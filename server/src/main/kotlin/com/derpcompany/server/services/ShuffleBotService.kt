@@ -4,9 +4,9 @@ import com.derpcompany.server.Qualifiers
 import dev.kord.common.entity.ChannelType
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
-import dev.kord.core.behavior.interaction.response.respond
 import dev.kord.core.entity.channel.VoiceChannel
-import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
+import dev.kord.core.entity.interaction.GuildChatInputCommandInteraction
+import dev.kord.rest.builder.message.modify.InteractionResponseModifyBuilder
 import kotlinx.coroutines.flow.toList
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -27,31 +27,42 @@ class ShuffleBotService(
     private val kord: Kord,
 ) {
 
-    suspend fun onGuildChatInputCommandInteractionCreateEvent(event: GuildChatInputCommandInteractionCreateEvent) {
-        val deferredResponse = event.interaction.deferPublicResponse()
-        val command = event.interaction.command
-        val channelId: Snowflake = event.interaction.channelId
+    /**
+     * Handle an [interaction] of type [GuildChatInputCommandInteraction]. Return a lambda that will be used to create
+     * a response.
+     */
+    suspend fun handleInteraction(
+        interaction: GuildChatInputCommandInteraction,
+    ): InteractionResponseModifyBuilder.() -> Unit {
+        val command = interaction.command
+        val channelId: Snowflake = interaction.channelId
 
+        // Get an argument passed in the command
         val groupCount = command.integers.getValue("groups")
 
+        // Fetch the channel to ensure we are on an audio channel
         val channel = kord.getChannel(id = channelId) ?: throw IllegalStateException("Failed to fetch channel")
         if (channel.type != ChannelType.GuildVoice) {
-            deferredResponse.respond {
+            return {
                 content = "ERROR MESSAGE"
             }
-            return
         }
 
+        // Fetch the channel, for real this time.
         val voiceChannel = kord.getChannelOf<VoiceChannel>(id = channelId) ?: throw IllegalStateException(
             "Failed to fetch voice channel",
         )
-        val members = voiceChannel.voiceStates.toList().map { it.getMember() }
 
-        val usernames = members.joinToString { it.username }
+        // Get the list of members in this channel
+        val membersRaw = voiceChannel.voiceStates.toList()
+        val members = membersRaw.map { it.getMember() }
+
+        val usernames = members.joinToString("\n") { it.username }
         logger.debug("Members in channel ${channel.data.name.value}, to be split in $groupCount groups: [$usernames]")
 
-        deferredResponse.respond {
-            content = "Members: $usernames"
+        // Build the response
+        return {
+            content = usernames
         }
     }
 

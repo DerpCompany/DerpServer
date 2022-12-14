@@ -38,6 +38,7 @@ dependencies {
         exclude(module = "mockito-core")
     }
     testImplementation("com.ninja-squad:springmockk:3.1.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 }
 
 detekt {

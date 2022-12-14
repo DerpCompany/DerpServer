@@ -3,11 +3,13 @@ package com.derpcompany.server.controllers
 import com.derpcompany.server.Qualifiers
 import com.derpcompany.server.services.ShuffleBotService
 import dev.kord.core.Kord
+import dev.kord.core.behavior.interaction.response.respond
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.builder.interaction.int
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -22,7 +24,7 @@ import org.springframework.stereotype.Service
  * Version: 1.0
  * Date: 12/6/2022 11:25
  *
- * Controller that sets the interface for the ShuffleBot. It takes care of initializing the events or commands to
+ * Controller that sets the interface for the ShuffleBot. It takes care of initializing the events and commands to
  * listen to.
  */
 
@@ -34,9 +36,11 @@ class ShuffleBotController(
     private val shuffleBotService: ShuffleBotService,
 ) : ApplicationListener<ContextRefreshedEvent> {
 
+    @Suppress("SwallowedException")
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         logger.info("Initializing")
         scope.launch {
+            // Register the command to listen to.
             kord.createGlobalChatInputCommand(
                 "shuffle",
                 "Shuffle the users in this channel into several groups",
@@ -45,12 +49,26 @@ class ShuffleBotController(
                     required = true
                 }
             }
+
+            // Configure the callback for any registered commands.
             kord.on<GuildChatInputCommandInteractionCreateEvent> {
                 logger.info("GuildChatInputCommandInteractionCreateEvent received")
                 logger.debug("Received event data: ${this.interaction}")
-                shuffleBotService.onGuildChatInputCommandInteractionCreateEvent(this)
+
+                val deferredResponse = interaction.deferPublicResponse()
+                val responseBuilder = try {
+                    shuffleBotService.handleInteraction(this.interaction)
+                } catch (cancellation: CancellationException) {
+                    throw cancellation
+                } catch (throwable: Throwable) {
+                    {
+                        content = "There was an exception :("
+                    }
+                }
+                deferredResponse.respond(responseBuilder)
             }
 
+            // Initialize the bot
             kord.login {
                 // we need to specify this to receive the content of messages
                 @OptIn(PrivilegedIntent::class)
