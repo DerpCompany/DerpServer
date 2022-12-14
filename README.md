@@ -1,9 +1,7 @@
 # Derp Server
 Derp Company website 
 
-[![Build](https://github.com/DerpCompany/DerpServer/actions/workflows/Build.yml/badge.svg)](https://github.com/DerpCompany/DerpServer/actions/workflows/Build.yml)
-
-[![Integration Test](https://github.com/DerpCompany/DerpServer/actions/workflows/IntegrationTest.yml/badge.svg)](https://github.com/DerpCompany/DerpServer/actions/workflows/IntegrationTest.yml)
+[![Release](https://github.com/DerpCompany/DerpServer/actions/workflows/Release.yml/badge.svg)](https://github.com/DerpCompany/DerpServer/actions/workflows/Release.yml)
 
 ![Code Coverage](.github/badges/jacoco.svg)
 
