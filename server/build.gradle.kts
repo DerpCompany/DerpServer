@@ -103,3 +103,9 @@ openApiGenerate {
 tasks.compileJava {
     dependsOn(tasks.openApiGenerate)
 }
+
+// Make an executable Jar for Unix
+tasks.bootJar {
+    launchScript()
+    archiveFileName.set("derpserver.jar")
+}
