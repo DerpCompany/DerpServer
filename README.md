@@ -43,3 +43,7 @@ dependencies, you may need to reimport your project. Try the following.
   - `rm -r ~/.m2/`
   - `rm -r ~/.gradle/.tmp/ ~/.gradle/caches/`
 - Launch IntelliJ and open the project again. Now the classes should show up correctly.
+
+## Launching the server
+
+For more detailed on how to configure and launch the server, go to the [installation](INSTALL.md) page.

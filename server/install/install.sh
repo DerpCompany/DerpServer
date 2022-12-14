@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "This file is for reference only. It is not intended to be used as is."
+
+exit
+
 cp server/build/libs/derpserver.jar /opt/derpserver/derpserver.jar
 
 touch /opt/derpserver/application.properties
