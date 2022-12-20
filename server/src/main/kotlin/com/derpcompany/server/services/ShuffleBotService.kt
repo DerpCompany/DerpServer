@@ -72,7 +72,7 @@ class ShuffleBotService(
      */
     fun shuffleUsers(
         members: List<String>,
-        groupCount: Int
+        groupCount: Int,
     ): List<List<String>> {
         val groupList: MutableList<MutableList<String>> = mutableListOf()
 
@@ -81,7 +81,7 @@ class ShuffleBotService(
 
         // determine number of members in each group
         val totalMembers = shuffledMembers.size
-        val groupSize = totalMembers / groupCount  // already will floor the val when dividing two ints
+        val groupSize = totalMembers / groupCount // already will floor the val when dividing two ints
 
         // create your groups and add them to a list
         val smallGroup: MutableList<String> = mutableListOf()
@@ -93,7 +93,7 @@ class ShuffleBotService(
             }
         }
 
-        //TODO: Make this more dynamic to randomly allocate the remainder members to other lists
+        // TODO: Make this more dynamic to randomly allocate the remainder members to other lists
         // Check if smallGroup has any remainders. If so, add the remainder to the last group of our list
         if (smallGroup.isNotEmpty()) {
             groupList.last().addAll(smallGroup)
