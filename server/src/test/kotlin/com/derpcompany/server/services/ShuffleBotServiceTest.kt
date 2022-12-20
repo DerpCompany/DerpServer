@@ -66,6 +66,7 @@ class ShuffleBotServiceTest {
     fun tearDown() = Unit
 
     // TESTS
+    @Suppress("LongMethod")
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `call handleInteraction on audio channel`() = runTest {
