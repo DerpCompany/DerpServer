@@ -7,6 +7,29 @@ Derp Company Server Installation
 - Systemd support
 - Java 17
 
+## Automatic Installation
+
+The automatic installation will execute the steps in the **Manual Installation** phase. If this is your first time installing
+this service, it is recommended to read the **Manual Installation**, so you can understand what is going on.
+
+To install the server as a systemd service, run the following:
+
+`./install.sh`
+
+This command will start the server as a systemd service. You can interface with it trough systemctl:
+
+Start server
+
+```systemctl start derpserver.service```
+
+Stop server
+
+```systemctl stop derpserver.service```
+
+Enable the service on boot:
+
+```systemctl enable derpserver.service```
+
 ## Manual Installation
 
 ### 1. Build the executable.
