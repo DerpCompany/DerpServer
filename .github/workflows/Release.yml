@@ -30,3 +30,6 @@ jobs:
         run: ./gradlew server:build
         env:
           SHUFFLE_BOT_TOKEN: ${{ secrets.SHUFFLE_BOT }}
+      - name: Run build script
+        run: ./install.sh
+        shell: bash
