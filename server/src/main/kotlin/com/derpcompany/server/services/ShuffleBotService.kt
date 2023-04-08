@@ -44,7 +44,7 @@ class ShuffleBotService(
         val channel = kord.getChannel(id = channelId) ?: throw IllegalStateException("Failed to fetch channel")
         if (channel.type != ChannelType.GuildVoice) {
             return {
-                content = "ONLY AVAILABLE IN VOICE CHANNELS"
+                content = "ONLY AVAILABLE IN VOICE CHANNELS \uD83E\uDDD0"
             }
         }
 
@@ -62,7 +62,7 @@ class ShuffleBotService(
         // Check if there is at least one person in the VC
         if (membersRaw.isEmpty()) {
             return {
-                content = "The VC is empty, what are you trying to do?"
+                content = "The VC is empty, \uD83D\uDE44 what are you trying to do?"
             }
         }
 
@@ -73,7 +73,7 @@ class ShuffleBotService(
 
         // Build the response
         return {
-            content = shuffledMembers.toString()
+           content = printShuffledMembers(shuffledMembers)
         }
     }
 
@@ -113,10 +113,24 @@ class ShuffleBotService(
         return groupList
     }
 
+    /**
+     * Builds a string of the groups and their members to easily display the final
+     * results of the shuffle
+     */
     fun printShuffledMembers(
         shuffledMembers: List<List<String>>,
-    ) {
+    ): String {
+        val shuffleString = StringBuilder()
 
+        shuffledMembers.forEachIndexed { index, members ->
+            shuffleString.append("Group ${index + 1}: ")
+            members.forEach{ member ->
+                shuffleString.append(member)
+                shuffleString.append(" ")
+            }
+            shuffleString.append("\n")
+        }
+        return shuffleString.toString()
     }
 
     companion object {

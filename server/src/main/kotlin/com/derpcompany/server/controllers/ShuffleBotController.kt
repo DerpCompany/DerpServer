@@ -62,7 +62,7 @@ class ShuffleBotController(
                     throw cancellation
                 } catch (throwable: Throwable) {
                     {
-                        content = "There was an exception :("
+                        content = "There was an exception \uD83D\uDE31"
                     }
                 }
                 deferredResponse.respond(responseBuilder)
