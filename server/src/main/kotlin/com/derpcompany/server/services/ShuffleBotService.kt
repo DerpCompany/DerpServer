@@ -28,8 +28,8 @@ class ShuffleBotService(
 ) {
 
     /**
-     * Handle an [interaction] of type [GuildChatInputCommandInteraction]. Return a lambda that will be used to create
-     * a response.
+     * Handle an [interaction] of type [GuildChatInputCommandInteraction].
+     * Return a lambda that will be used to create a response.
      */
     suspend fun handleInteraction(
         interaction: GuildChatInputCommandInteraction,
@@ -44,7 +44,7 @@ class ShuffleBotService(
         val channel = kord.getChannel(id = channelId) ?: throw IllegalStateException("Failed to fetch channel")
         if (channel.type != ChannelType.GuildVoice) {
             return {
-                content = "ERROR MESSAGE"
+                content = "ONLY AVAILABLE IN VOICE CHANNELS"
             }
         }
 
@@ -64,6 +64,42 @@ class ShuffleBotService(
         return {
             content = usernames
         }
+    }
+
+    /**
+     * Shuffles the [members] in the voice channel and groups them into the number of [groupCount]
+     * Return a list of groups created and their respective list of users
+     */
+    fun shuffleUsers(
+        members: List<String>,
+        groupCount: Int,
+    ): List<List<String>> {
+        val groupList: MutableList<MutableList<String>> = mutableListOf()
+
+        // Shuffle the list of members and save in a new list
+        val shuffledMembers = members.shuffled()
+
+        // determine number of members in each group
+        val totalMembers = shuffledMembers.size
+        val groupSize = totalMembers / groupCount // already will floor the val when dividing two ints
+
+        // create your groups and add them to a list
+        val smallGroup: MutableList<String> = mutableListOf()
+        shuffledMembers.forEach { member ->
+            smallGroup.add(member)
+            if (smallGroup.size == groupSize) {
+                groupList.add(smallGroup.toMutableList()) // copy the temp list into our groupList
+                smallGroup.clear()
+            }
+        }
+
+        // TODO: Make this more dynamic to randomly allocate the remainder members to other lists
+        // Check if smallGroup has any remainders. If so, add the remainder to the last group of our list
+        if (smallGroup.isNotEmpty()) {
+            groupList.last().addAll(smallGroup)
+        }
+
+        return groupList
     }
 
     companion object {

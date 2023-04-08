@@ -66,15 +66,19 @@ class ShuffleBotServiceTest {
     fun tearDown() = Unit
 
     // TESTS
+    @Suppress("LongMethod")
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `call handleInteraction on audio channel`() = runTest {
         // WHEN
-        val interaction = spyk(GuildChatInputCommandInteraction(ShuffleBotData.defaultInteractionData, kord, defaultSupplier))
-        val channel = spyk(ShuffleBotData.createTestChannel(
-            kord = kord,
-            supplier = defaultSupplier,
-        ))
+        val interaction =
+            spyk(GuildChatInputCommandInteraction(ShuffleBotData.defaultInteractionData, kord, defaultSupplier))
+        val channel = spyk(
+            ShuffleBotData.createTestChannel(
+                kord = kord,
+                supplier = defaultSupplier,
+            )
+        )
 
         coEvery { kord.getChannel(ShuffleBotData.defaultChannelId, any()) } returns channel
         coEvery { kord.getChannelOf<VoiceChannel>(ShuffleBotData.defaultChannelId) } returns channel
@@ -87,20 +91,36 @@ class ShuffleBotServiceTest {
         val query: Query<VoiceStateData> = mockk()
         every { query.asFlow() } returns members.asFlow()
 
-        every { channel getProperty "voiceStates" } returns members.map { VoiceState(it, kord, defaultSupplier) }.asFlow()
-        coEvery { defaultSupplier.getMember(any(), eq(ShuffleBotData.defaultMemberId)) } returns ShuffleBotData.createTestMember(
+        every { channel getProperty "voiceStates" } returns members.map { VoiceState(it, kord, defaultSupplier) }
+            .asFlow()
+        coEvery {
+            defaultSupplier.getMember(
+                any(),
+                eq(ShuffleBotData.defaultMemberId)
+            )
+        } returns ShuffleBotData.createTestMember(
             ShuffleBotData.defaultMemberId,
             ShuffleBotData.defaultUsername,
             kord = kord,
             supplier = defaultSupplier,
         )
-        coEvery { defaultSupplier.getMember(any(), eq(ShuffleBotData.memberId2)) } returns ShuffleBotData.createTestMember(
+        coEvery {
+            defaultSupplier.getMember(
+                any(),
+                eq(ShuffleBotData.memberId2)
+            )
+        } returns ShuffleBotData.createTestMember(
             ShuffleBotData.memberId2,
             "empathy",
             kord = kord,
             supplier = defaultSupplier,
         )
-        coEvery { defaultSupplier.getMember(any(), eq(ShuffleBotData.memberId3)) } returns ShuffleBotData.createTestMember(
+        coEvery {
+            defaultSupplier.getMember(
+                any(),
+                eq(ShuffleBotData.memberId3)
+            )
+        } returns ShuffleBotData.createTestMember(
             ShuffleBotData.memberId3,
             "animus",
             kord = kord,
@@ -112,9 +132,53 @@ class ShuffleBotServiceTest {
         val response = InteractionResponseModifyBuilder().apply(responseBuilder)
 
         // ASSERT
-        assertEquals("""
+        assertEquals(
+            """
             cramsan
             empathy
-            animus""".trimIndent(), response.content)
+            animus""".trimIndent(), response.content
+        )
+    }
+
+    /**
+     * Test our shuffle algorithm is creating groups based on input values with 7 members
+     */
+    @Test
+    fun `shuffle list of 7 members and get two groups of 3 and 4 members`() {
+        // WHEN
+        val membersList = listOf("empathy", "cramsan", "zax", "holmes", "hyth", "moto", "bard")
+        val groupCount = 2
+        val groupSize = 3
+
+        // DO
+        val groupList = service.shuffleUsers(membersList, groupCount)
+
+        // ASSERT
+        assertEquals(groupCount, groupList.size)
+        assertEquals(groupSize, groupList[0].size)
+        assertEquals(groupSize + 1, groupList[1].size)
+    }
+
+    /**
+     * Test our shuffle algorithm is creating groups based on input values
+     */
+    @Test
+    fun `shuffle list of 11 members and get 3 groups of 3, 3, and 5 members`() {
+        // WHEN
+        val membersList = listOf(
+            "larc", "shinji", "empathy", "cramsan", "zax", "holmes", "hyth", "moto", "bard",
+            "jouhou", "glassdagger"
+        )
+        val groupCount = 3
+        val groupSize = 3
+
+        // DO
+        val groupList = service.shuffleUsers(membersList, groupCount)
+
+        // ASSERT
+        assertEquals(groupCount, groupList.size)
+        assertEquals(groupSize, groupList[0].size)
+        assertEquals(groupSize, groupList[1].size)
+        assertEquals(groupSize + 2, groupList[2].size)
     }
 }
