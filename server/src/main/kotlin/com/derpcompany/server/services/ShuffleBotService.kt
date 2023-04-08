@@ -96,7 +96,7 @@ class ShuffleBotService(
 
         // create your groups and add them to a list
         val smallGroup: MutableList<String> = mutableListOf()
-        shuffledMembers.forEachIndexed { index, member ->
+        shuffledMembers.forEachIndexed { _, member ->
             smallGroup.add(member)
             if (smallGroup.size == groupSize) {
                 groupList.add(smallGroup.toMutableList()) // copy the temp list into our groupList
