@@ -55,14 +55,25 @@ class ShuffleBotService(
 
         // Get the list of members in this channel
         val membersRaw = voiceChannel.voiceStates.toList()
-        val members = membersRaw.map { it.getMember() }
+        val members = membersRaw.map {
+            it.getMember().username
+        }
 
-        val usernames = members.joinToString("\n") { it.username }
+        // Check if there is at least one person in the VC
+        if (membersRaw.isEmpty()) {
+            return {
+                content = "The VC is empty, what are you trying to do?"
+            }
+        }
+
+        val usernames = members.joinToString("\n")
         logger.debug("Members in channel ${channel.data.name.value}, to be split in $groupCount groups: [$usernames]")
+
+        val shuffledMembers = shuffleUsers(members, groupCount.toInt())
 
         // Build the response
         return {
-            content = usernames
+            content = shuffledMembers.toString()
         }
     }
 
@@ -72,7 +83,7 @@ class ShuffleBotService(
      */
     fun shuffleUsers(
         members: List<String>,
-        groupCount: Int
+        groupCount: Int,
     ): List<List<String>> {
         val groupList: MutableList<MutableList<String>> = mutableListOf()
 
@@ -100,6 +111,12 @@ class ShuffleBotService(
         }
 
         return groupList
+    }
+
+    fun printShuffledMembers(
+        shuffledMembers: List<List<String>>,
+    ) {
+
     }
 
     companion object {
