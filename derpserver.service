@@ -3,8 +3,9 @@ Description=Derp Server service
 After=syslog.target
 
 [Service]
-User=derpserver
-ExecStart=/opt/derpserver/derpserver.jar
+WorkingDirectory=/opt/derpserver
+ExecStart=/bin/java -jar /opt/derpserver/derpserver.jar
+ExecStop=/bin/kill -15 $MAINPID
 SuccessExitStatus=143
 
 [Install]

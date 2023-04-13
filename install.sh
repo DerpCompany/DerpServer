@@ -21,8 +21,8 @@ systemctl stop $SYSTEMD_FILE
 
 cp $ARTIFACT_FOLDER/$ARTIFACT_FILE $INSTALLATION_FOLDER/$ARTIFACT_FILE
 
-sudo cp $SYSTEMD_FILE /etc/systemd/system/$SYSTEMD_FILE
+echo "Make sure to install the systemd unit file"
+echo "cp -f $SYSTEMD_FILE /etc/systemd/system/$SYSTEMD_FILE"
 
 systemctl daemon-reload
-
 systemctl restart $SYSTEMD_FILE
