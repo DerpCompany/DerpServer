@@ -3,10 +3,11 @@
 ARTIFACT_FILE="derpserver.jar"
 ARTIFACT_FOLDER="server/build/libs"
 
-INSTALLATION_FOLDER="/opt/derpserver/"
+INSTALLATION_FOLDER="$HOME/.local/derpserver"
 
 PROPERTIES_FILE="application.properties"
 SYSTEMD_FILE="derpserver.service"
+SYSTEMD_FOLDER="$HOME/.config/systemd/user"
 
 echo "Building Server Executable"
 sleep 2
@@ -17,12 +18,17 @@ mkdir -p $INSTALLATION_FOLDER
 
 touch $INSTALLATION_FOLDER/$PROPERTIES_FILE
 
-systemctl stop $SYSTEMD_FILE
+echo "Stopping server..."
+systemctl --user stop $SYSTEMD_FILE
 
+echo "Copying file $ARTIFACT_FOLDER/$ARTIFACT_FILE to $INSTALLATION_FOLDER/$ARTIFACT_FILE"
 cp $ARTIFACT_FOLDER/$ARTIFACT_FILE $INSTALLATION_FOLDER/$ARTIFACT_FILE
 
-echo "Make sure to install the systemd unit file"
-echo "cp -f $SYSTEMD_FILE /etc/systemd/system/$SYSTEMD_FILE"
+echo "Installing systemd unit $SYSTEMD_FILE in $SYSTEMD_FOLDER/$SYSTEMD_FILE"
+mkdir -p $SYSTEMD_FOLDER
+cp -f $SYSTEMD_FILE $SYSTEMD_FOLDER/$SYSTEMD_FILE
 
-systemctl daemon-reload
-systemctl restart $SYSTEMD_FILE
+echo "Starting server"
+systemctl --user daemon-reload
+systemctl --user restart $SYSTEMD_FILE
+systemctl --user enable $SYSTEMD_FILE
