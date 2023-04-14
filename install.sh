@@ -3,7 +3,7 @@
 ARTIFACT_FILE="derpserver.jar"
 ARTIFACT_FOLDER="server/build/libs"
 
-INSTALLATION_FOLDER="~/.local/derpserver"
+INSTALLATION_FOLDER="$HOME/.local/derpserver"
 
 PROPERTIES_FILE="application.properties"
 SYSTEMD_FILE="derpserver.service"
