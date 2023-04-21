@@ -22,6 +22,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
 
 /**
  * Author: cramsan
@@ -50,10 +51,15 @@ class ShuffleBotServiceTest {
     @MockK
     lateinit var cache: DataCache
 
+    val random = Random(1)
+
     @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this)
-        service = ShuffleBotService(kord)
+        service = ShuffleBotService(
+            kord,
+            random,
+        )
 
         every { clientResources.defaultStrategy } returns EntitySupplyStrategy.rest
         every { kord.defaultSupplier } returns defaultSupplier
@@ -132,12 +138,7 @@ class ShuffleBotServiceTest {
         val response = InteractionResponseModifyBuilder().apply(responseBuilder)
 
         // ASSERT
-        assertEquals(
-            """
-            cramsan
-            empathy
-            animus""".trimIndent(), response.content
-        )
+        assertEquals("Group 1: animus empathy cramsan \n", response.content)
     }
 
     /**

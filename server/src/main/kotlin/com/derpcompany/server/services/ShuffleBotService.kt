@@ -12,6 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
+import kotlin.random.Random
 
 /**
  * Author: cramsan
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service
 class ShuffleBotService(
     @Qualifier(Qualifiers.SHUFFLE_BOT)
     private val kord: Kord,
+    private val random: Random,
 ) {
 
     /**
@@ -73,7 +75,7 @@ class ShuffleBotService(
 
         // Build the response
         return {
-           content = printShuffledMembers(shuffledMembers)
+            content = printShuffledMembers(shuffledMembers)
         }
     }
 
@@ -88,11 +90,11 @@ class ShuffleBotService(
         val groupList: MutableList<MutableList<String>> = mutableListOf()
 
         // Shuffle the list of members and save in a new list
-        val shuffledMembers = members.shuffled()
+        val shuffledMembers = members.shuffled(random)
 
         // determine number of members in each group
         val totalMembers = shuffledMembers.size
-        val groupSize = totalMembers / groupCount  // already will floor the val when dividing two ints
+        val groupSize = totalMembers / groupCount // already will floor the val when dividing two ints
 
         // create your groups and add them to a list
         val smallGroup: MutableList<String> = mutableListOf()
@@ -104,10 +106,10 @@ class ShuffleBotService(
             }
         }
 
-        //TODO: Make this more dynamic to randomly allocate the remainder members to other lists
+        // TODO: Make this more dynamic to randomly allocate the remainder members to other lists
         // Check if smallGroup has any remainders. If so, add the remainder to the last group of our list
         if (smallGroup.isNotEmpty()) {
-            groupList.last().addAll(smallGroup)
+            groupList.add(smallGroup)
         }
 
         return groupList
@@ -124,7 +126,7 @@ class ShuffleBotService(
 
         shuffledMembers.forEachIndexed { index, members ->
             shuffleString.append("Group ${index + 1}: ")
-            members.forEach{ member ->
+            members.forEach { member ->
                 shuffleString.append(member)
                 shuffleString.append(" ")
             }
