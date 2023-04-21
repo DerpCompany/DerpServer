@@ -129,6 +129,10 @@ class ShuffleBotService(
     fun printShuffledMembers(
         shuffledMembers: List<List<String>>,
     ): String {
+        if (shuffledMembers.isEmpty()) {
+            return "Could not create any group."
+        }
+
         val shuffleString = StringBuilder()
 
         shuffledMembers.forEachIndexed { index, members ->
