@@ -8,7 +8,6 @@ import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEve
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
-import dev.kord.rest.builder.interaction.boolean
 import dev.kord.rest.builder.interaction.int
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
