@@ -49,6 +49,7 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+.run/
 
 ### NetBeans ###
 /nbproject/private/

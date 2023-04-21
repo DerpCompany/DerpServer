@@ -12,6 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
+import kotlin.random.Random
 
 /**
  * Author: cramsan
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service
 class ShuffleBotService(
     @Qualifier(Qualifiers.SHUFFLE_BOT)
     private val kord: Kord,
+    private val random: Random,
 ) {
 
     /**
@@ -44,7 +46,7 @@ class ShuffleBotService(
         val channel = kord.getChannel(id = channelId) ?: throw IllegalStateException("Failed to fetch channel")
         if (channel.type != ChannelType.GuildVoice) {
             return {
-                content = "ONLY AVAILABLE IN VOICE CHANNELS"
+                content = "ONLY AVAILABLE IN VOICE CHANNELS \uD83E\uDDD0"
             }
         }
 
@@ -55,14 +57,25 @@ class ShuffleBotService(
 
         // Get the list of members in this channel
         val membersRaw = voiceChannel.voiceStates.toList()
-        val members = membersRaw.map { it.getMember() }
+        val members = membersRaw.map {
+            it.getMember().username
+        }
 
-        val usernames = members.joinToString("\n") { it.username }
+        // Check if there is at least one person in the VC
+        if (membersRaw.isEmpty()) {
+            return {
+                content = "The VC is empty, \uD83D\uDE44 what are you trying to do?"
+            }
+        }
+
+        val usernames = members.joinToString(", ")
         logger.debug("Members in channel ${channel.data.name.value}, to be split in $groupCount groups: [$usernames]")
+
+        val shuffledMembers = shuffleUsers(members, groupCount.toInt())
 
         // Build the response
         return {
-            content = usernames
+            content = printShuffledMembers(shuffledMembers)
         }
     }
 
@@ -74,10 +87,14 @@ class ShuffleBotService(
         members: List<String>,
         groupCount: Int,
     ): List<List<String>> {
+        if (groupCount <= 0) {
+            return emptyList()
+        }
+
         val groupList: MutableList<MutableList<String>> = mutableListOf()
 
         // Shuffle the list of members and save in a new list
-        val shuffledMembers = members.shuffled()
+        val shuffledMembers = members.shuffled(random)
 
         // determine number of members in each group
         val totalMembers = shuffledMembers.size
@@ -85,7 +102,7 @@ class ShuffleBotService(
 
         // create your groups and add them to a list
         val smallGroup: MutableList<String> = mutableListOf()
-        shuffledMembers.forEach { member ->
+        shuffledMembers.forEachIndexed { _, member ->
             smallGroup.add(member)
             if (smallGroup.size == groupSize) {
                 groupList.add(smallGroup.toMutableList()) // copy the temp list into our groupList
@@ -93,13 +110,38 @@ class ShuffleBotService(
             }
         }
 
-        // TODO: Make this more dynamic to randomly allocate the remainder members to other lists
-        // Check if smallGroup has any remainders. If so, add the remainder to the last group of our list
-        if (smallGroup.isNotEmpty()) {
-            groupList.last().addAll(smallGroup)
+        // Distribute the remainder members across the existing lists
+        smallGroup.forEachIndexed { index, member ->
+            if (groupList.getOrNull(index) == null) {
+                groupList.add(index, mutableListOf())
+            }
+
+            groupList[index].add(member)
         }
 
         return groupList
+    }
+
+    /**
+     * Builds a string of the groups and their members to easily display the final
+     * results of the shuffle
+     */
+    fun printShuffledMembers(
+        shuffledMembers: List<List<String>>,
+    ): String {
+        if (shuffledMembers.isEmpty()) {
+            return "Could not create any group."
+        }
+
+        val shuffleString = StringBuilder()
+
+        shuffledMembers.forEachIndexed { index, members ->
+            shuffleString.append("Group ${index + 1}: ")
+            val membersString = members.joinToString(", ")
+            shuffleString.append(membersString)
+            shuffleString.append("\n")
+        }
+        return shuffleString.toString()
     }
 
     companion object {
