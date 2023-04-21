@@ -68,7 +68,7 @@ class ShuffleBotService(
             }
         }
 
-        val usernames = members.joinToString("\n")
+        val usernames = members.joinToString(", ")
         logger.debug("Members in channel ${channel.data.name.value}, to be split in $groupCount groups: [$usernames]")
 
         val shuffledMembers = shuffleUsers(members, groupCount.toInt())
@@ -87,6 +87,10 @@ class ShuffleBotService(
         members: List<String>,
         groupCount: Int,
     ): List<List<String>> {
+        if (groupCount <= 0) {
+            return emptyList()
+        }
+
         val groupList: MutableList<MutableList<String>> = mutableListOf()
 
         // Shuffle the list of members and save in a new list
@@ -106,10 +110,13 @@ class ShuffleBotService(
             }
         }
 
-        // TODO: Make this more dynamic to randomly allocate the remainder members to other lists
-        // Check if smallGroup has any remainders. If so, add the remainder to the last group of our list
-        if (smallGroup.isNotEmpty()) {
-            groupList.add(smallGroup)
+        // Distribute the remainder members across the existing lists
+        smallGroup.forEachIndexed { index, member ->
+            if (groupList.getOrNull(index) == null) {
+                groupList.add(index, mutableListOf())
+            }
+
+            groupList[index].add(member)
         }
 
         return groupList
@@ -126,10 +133,8 @@ class ShuffleBotService(
 
         shuffledMembers.forEachIndexed { index, members ->
             shuffleString.append("Group ${index + 1}: ")
-            members.forEach { member ->
-                shuffleString.append(member)
-                shuffleString.append(" ")
-            }
+            val membersString = members.joinToString(", ")
+            shuffleString.append(membersString)
             shuffleString.append("\n")
         }
         return shuffleString.toString()
