@@ -12,6 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
+import kotlin.random.Random
 
 /**
  * Author: cramsan
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service
 class ShuffleBotService(
     @Qualifier(Qualifiers.SHUFFLE_BOT)
     private val kord: Kord,
+    private val random: Random,
 ) {
 
     /**
@@ -66,14 +68,14 @@ class ShuffleBotService(
             }
         }
 
-        val usernames = members.joinToString("\n")
+        val usernames = members.joinToString(", ")
         logger.debug("Members in channel ${channel.data.name.value}, to be split in $groupCount groups: [$usernames]")
 
         val shuffledMembers = shuffleUsers(members, groupCount.toInt())
 
         // Build the response
         return {
-           content = printShuffledMembers(shuffledMembers)
+            content = printShuffledMembers(shuffledMembers)
         }
     }
 
@@ -85,14 +87,18 @@ class ShuffleBotService(
         members: List<String>,
         groupCount: Int,
     ): List<List<String>> {
+        if (groupCount <= 0) {
+            return emptyList()
+        }
+
         val groupList: MutableList<MutableList<String>> = mutableListOf()
 
         // Shuffle the list of members and save in a new list
-        val shuffledMembers = members.shuffled()
+        val shuffledMembers = members.shuffled(random)
 
         // determine number of members in each group
         val totalMembers = shuffledMembers.size
-        val groupSize = totalMembers / groupCount  // already will floor the val when dividing two ints
+        val groupSize = totalMembers / groupCount // already will floor the val when dividing two ints
 
         // create your groups and add them to a list
         val smallGroup: MutableList<String> = mutableListOf()
@@ -104,10 +110,13 @@ class ShuffleBotService(
             }
         }
 
-        //TODO: Make this more dynamic to randomly allocate the remainder members to other lists
-        // Check if smallGroup has any remainders. If so, add the remainder to the last group of our list
-        if (smallGroup.isNotEmpty()) {
-            groupList.last().addAll(smallGroup)
+        // Distribute the remainder members across the existing lists
+        smallGroup.forEachIndexed { index, member ->
+            if (groupList.getOrNull(index) == null) {
+                groupList.add(index, mutableListOf())
+            }
+
+            groupList[index].add(member)
         }
 
         return groupList
@@ -120,14 +129,16 @@ class ShuffleBotService(
     fun printShuffledMembers(
         shuffledMembers: List<List<String>>,
     ): String {
+        if (shuffledMembers.isEmpty()) {
+            return "Could not create any group."
+        }
+
         val shuffleString = StringBuilder()
 
         shuffledMembers.forEachIndexed { index, members ->
             shuffleString.append("Group ${index + 1}: ")
-            members.forEach{ member ->
-                shuffleString.append(member)
-                shuffleString.append(" ")
-            }
+            val membersString = members.joinToString(", ")
+            shuffleString.append(membersString)
             shuffleString.append("\n")
         }
         return shuffleString.toString()

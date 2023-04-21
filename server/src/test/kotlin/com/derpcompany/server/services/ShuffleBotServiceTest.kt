@@ -22,6 +22,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
 
 /**
  * Author: cramsan
@@ -50,10 +51,15 @@ class ShuffleBotServiceTest {
     @MockK
     lateinit var cache: DataCache
 
+    val random = Random(1)
+
     @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this)
-        service = ShuffleBotService(kord)
+        service = ShuffleBotService(
+            kord,
+            random,
+        )
 
         every { clientResources.defaultStrategy } returns EntitySupplyStrategy.rest
         every { kord.defaultSupplier } returns defaultSupplier
@@ -132,12 +138,9 @@ class ShuffleBotServiceTest {
         val response = InteractionResponseModifyBuilder().apply(responseBuilder)
 
         // ASSERT
-        assertEquals(
-            """
-            cramsan
-            empathy
-            animus""".trimIndent(), response.content
-        )
+        assertEquals("Group 1: animus\n" +
+                "Group 2: empathy\n" +
+                "Group 3: cramsan\n", response.content)
     }
 
     /**
@@ -146,9 +149,12 @@ class ShuffleBotServiceTest {
     @Test
     fun `shuffle list of 7 members and get two groups of 3 and 4 members`() {
         // WHEN
-        val membersList = listOf("empathy", "cramsan", "zax", "holmes", "hyth", "moto", "bard")
+        val membersList = listOf(
+            "empathy", "cramsan", "zax", "holmes",
+            "hyth", "moto", "bard",
+        )
         val groupCount = 2
-        val groupSize = 3
+        val groupSize = 4
 
         // DO
         val groupList = service.shuffleUsers(membersList, groupCount)
@@ -156,21 +162,22 @@ class ShuffleBotServiceTest {
         // ASSERT
         assertEquals(groupCount, groupList.size)
         assertEquals(groupSize, groupList[0].size)
-        assertEquals(groupSize + 1, groupList[1].size)
+        assertEquals(groupSize - 1, groupList[1].size)
     }
 
     /**
      * Test our shuffle algorithm is creating groups based on input values
      */
     @Test
-    fun `shuffle list of 11 members and get 3 groups of 3, 3, and 5 members`() {
+    fun `shuffle list of 11 members and get 3 groups of 4, 4, and 3 members`() {
         // WHEN
         val membersList = listOf(
-            "larc", "shinji", "empathy", "cramsan", "zax", "holmes", "hyth", "moto", "bard",
-            "jouhou", "glassdagger"
+            "larc", "shinji", "empathy", "cramsan",
+            "zax", "holmes", "hyth", "moto",
+            "bard", "jouhou", "glassdagger"
         )
         val groupCount = 3
-        val groupSize = 3
+        val groupSize = 4
 
         // DO
         val groupList = service.shuffleUsers(membersList, groupCount)
@@ -179,6 +186,80 @@ class ShuffleBotServiceTest {
         assertEquals(groupCount, groupList.size)
         assertEquals(groupSize, groupList[0].size)
         assertEquals(groupSize, groupList[1].size)
-        assertEquals(groupSize + 2, groupList[2].size)
+        assertEquals(groupSize - 1, groupList[2].size)
+    }
+
+    @Test
+    fun `shuffle list of 10 members into 3 groups`() {
+        // WHEN
+        val membersList = listOf(
+            "empathy", "cramsan", "zax", "abba",
+            "holmes", "hyth", "moto",
+            "bard", "adsf", "test",
+        )
+        val groupCount = 3
+
+        // DO
+        val groupList = service.shuffleUsers(membersList, groupCount)
+
+        // ASSERT
+        assertEquals(groupCount, groupList.size)
+        assertEquals(4, groupList[0].size)
+        assertEquals(3, groupList[1].size)
+        assertEquals(3, groupList[2].size)
+        assertEquals(listOf("cramsan", "holmes", "empathy", "hyth"), groupList[0])
+        assertEquals(listOf("moto", "zax", "adsf"), groupList[1])
+        assertEquals(listOf("test", "bard", "abba"), groupList[2])
+    }
+
+    @Test
+    fun `shuffle list of 3 members into 4 groups`() {
+        // WHEN
+        val membersList = listOf(
+            "empathy", "cramsan", "zax",
+        )
+        val groupCount = 4
+
+        // DO
+        val groupList = service.shuffleUsers(membersList, groupCount)
+
+        // ASSERT
+        assertEquals(3, groupList.size)
+        assertEquals(1, groupList[0].size)
+        assertEquals(1, groupList[1].size)
+        assertEquals(1, groupList[2].size)
+        assertEquals("zax", groupList[0].first())
+        assertEquals("cramsan", groupList[1].first())
+        assertEquals("empathy", groupList[2].first())
+    }
+
+    @Test
+    fun `shuffle list of members into -1 groups should return empty`() {
+        // WHEN
+        val membersList = listOf(
+            "empathy", "cramsan", "zax", "abba",
+        )
+        val groupCount = -1
+
+        // DO
+        val groupList = service.shuffleUsers(membersList, groupCount)
+
+        // ASSERT
+        assertEquals(0, groupList.size)
+    }
+
+    @Test
+    fun `shuffle list of members into 0 groups should return empty`() {
+        // WHEN
+        val membersList = listOf(
+            "empathy", "cramsan", "zax", "abba",
+        )
+        val groupCount = 0
+
+        // DO
+        val groupList = service.shuffleUsers(membersList, groupCount)
+
+        // ASSERT
+        assertEquals(0, groupList.size)
     }
 }

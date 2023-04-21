@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.time.Clock
+import kotlin.random.Random
 
 /**
  * Author: cramsan
@@ -44,4 +45,12 @@ class Configuration {
      */
     @Bean
     fun scope(): CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    /**
+     * Provide an instance of Random.
+     */
+    @Bean
+    fun random(): Random {
+        return Random.Default
+    }
 }
