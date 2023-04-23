@@ -27,9 +27,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class ChannelRepositoryTests @Autowired constructor(
     private val channelRepository: ChannelRepository,
 ) {
-    @LocalServerPort
-    private var port: Int = 0
-
     @BeforeEach
     fun setUp() {
         channelRepository.deleteAll()

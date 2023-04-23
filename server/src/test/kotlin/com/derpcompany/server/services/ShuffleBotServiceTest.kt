@@ -5,6 +5,7 @@ import dev.kord.cache.api.Query
 import dev.kord.core.ClientResources
 import dev.kord.core.Kord
 import dev.kord.core.cache.data.VoiceStateData
+import dev.kord.core.entity.Member
 import dev.kord.core.entity.VoiceState
 import dev.kord.core.entity.channel.VoiceChannel
 import dev.kord.core.entity.interaction.GuildChatInputCommandInteraction
@@ -15,9 +16,14 @@ import dev.kord.rest.service.InteractionService
 import dev.kord.rest.service.RestClient
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -49,16 +55,25 @@ class ShuffleBotServiceTest {
     lateinit var clientResources: ClientResources
 
     @MockK
+    lateinit var channelService: DiscordChannelService
+
+    @MockK
     lateinit var cache: DataCache
 
     val random = Random(1)
 
+    val scope = TestScope()
+
     @BeforeEach
     fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher(scope.testScheduler))
+
         MockKAnnotations.init(this)
         service = ShuffleBotService(
             kord,
             random,
+            scope,
+            channelService,
         )
 
         every { clientResources.defaultStrategy } returns EntitySupplyStrategy.rest
@@ -69,13 +84,15 @@ class ShuffleBotServiceTest {
     }
 
     @AfterEach
-    fun tearDown() = Unit
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     // TESTS
     @Suppress("LongMethod")
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `call handleInteraction on audio channel`() = runTest {
+    fun `call handleInteraction on audio channel`() = scope.runTest {
         // WHEN
         val interaction =
             spyk(GuildChatInputCommandInteraction(ShuffleBotData.defaultInteractionData, kord, defaultSupplier))
@@ -149,9 +166,9 @@ class ShuffleBotServiceTest {
     @Test
     fun `shuffle list of 7 members and get two groups of 3 and 4 members`() {
         // WHEN
-        val membersList = listOf(
-            "empathy", "cramsan", "zax", "holmes",
-            "hyth", "moto", "bard",
+        val membersList = listOf<Member>(
+            mockk(), mockk(), mockk(), mockk(),
+            mockk(), mockk(), mockk(),
         )
         val groupCount = 2
         val groupSize = 4
@@ -171,10 +188,10 @@ class ShuffleBotServiceTest {
     @Test
     fun `shuffle list of 11 members and get 3 groups of 4, 4, and 3 members`() {
         // WHEN
-        val membersList = listOf(
-            "larc", "shinji", "empathy", "cramsan",
-            "zax", "holmes", "hyth", "moto",
-            "bard", "jouhou", "glassdagger"
+        val membersList = listOf<Member>(
+            mockk(), mockk(), mockk(), mockk(),
+            mockk(), mockk(), mockk(), mockk(),
+            mockk(), mockk(), mockk(),
         )
         val groupCount = 3
         val groupSize = 4
@@ -192,10 +209,21 @@ class ShuffleBotServiceTest {
     @Test
     fun `shuffle list of 10 members into 3 groups`() {
         // WHEN
+        val empathy = mockk<Member>()
+        val cramsan = mockk<Member>()
+        val zax = mockk<Member>()
+        val abba = mockk<Member>()
+        val holmes = mockk<Member>()
+        val hyth = mockk<Member>()
+        val moto = mockk<Member>()
+        val bard = mockk<Member>()
+        val adsf = mockk<Member>()
+        val test = mockk<Member>()
+
         val membersList = listOf(
-            "empathy", "cramsan", "zax", "abba",
-            "holmes", "hyth", "moto",
-            "bard", "adsf", "test",
+            empathy, cramsan, zax, abba,
+            holmes, hyth, moto, bard,
+            adsf, test,
         )
         val groupCount = 3
 
@@ -207,16 +235,19 @@ class ShuffleBotServiceTest {
         assertEquals(4, groupList[0].size)
         assertEquals(3, groupList[1].size)
         assertEquals(3, groupList[2].size)
-        assertEquals(listOf("cramsan", "holmes", "empathy", "hyth"), groupList[0])
-        assertEquals(listOf("moto", "zax", "adsf"), groupList[1])
-        assertEquals(listOf("test", "bard", "abba"), groupList[2])
+        assertEquals(listOf(cramsan, holmes, empathy, hyth), groupList[0])
+        assertEquals(listOf(moto, zax, adsf), groupList[1])
+        assertEquals(listOf(test, bard, abba), groupList[2])
     }
 
     @Test
     fun `shuffle list of 3 members into 4 groups`() {
         // WHEN
+        val empathy = mockk<Member>()
+        val cramsan = mockk<Member>()
+        val zax = mockk<Member>()
         val membersList = listOf(
-            "empathy", "cramsan", "zax",
+            empathy, cramsan, zax,
         )
         val groupCount = 4
 
@@ -228,16 +259,20 @@ class ShuffleBotServiceTest {
         assertEquals(1, groupList[0].size)
         assertEquals(1, groupList[1].size)
         assertEquals(1, groupList[2].size)
-        assertEquals("zax", groupList[0].first())
-        assertEquals("cramsan", groupList[1].first())
-        assertEquals("empathy", groupList[2].first())
+        assertEquals(zax, groupList[0].first())
+        assertEquals(cramsan, groupList[1].first())
+        assertEquals(empathy, groupList[2].first())
     }
 
     @Test
     fun `shuffle list of members into -1 groups should return empty`() {
         // WHEN
+        val empathy = mockk<Member>()
+        val cramsan = mockk<Member>()
+        val zax = mockk<Member>()
+        val abba = mockk<Member>()
         val membersList = listOf(
-            "empathy", "cramsan", "zax", "abba",
+            empathy, cramsan, zax, abba,
         )
         val groupCount = -1
 
@@ -251,8 +286,12 @@ class ShuffleBotServiceTest {
     @Test
     fun `shuffle list of members into 0 groups should return empty`() {
         // WHEN
+        val empathy = mockk<Member>()
+        val cramsan = mockk<Member>()
+        val zax = mockk<Member>()
+        val abba = mockk<Member>()
         val membersList = listOf(
-            "empathy", "cramsan", "zax", "abba",
+            empathy, cramsan, zax, abba,
         )
         val groupCount = 0
 
