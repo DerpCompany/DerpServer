@@ -8,6 +8,7 @@ import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEve
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import dev.kord.rest.builder.interaction.boolean
 import dev.kord.rest.builder.interaction.int
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -48,12 +49,14 @@ class ShuffleBotController(
                 int("groups", "How many groups to create") {
                     required = true
                 }
+                boolean("move", "Create voice channels and move users there") {
+                }
             }
 
             // Configure the callback for any registered commands.
             kord.on<GuildChatInputCommandInteractionCreateEvent> {
                 logger.info("GuildChatInputCommandInteractionCreateEvent received")
-                logger.debug("Received event data: ${this.interaction}")
+                logger.debug("Received event data: {}", this.interaction)
 
                 val deferredResponse = interaction.deferPublicResponse()
                 val responseBuilder = try {
