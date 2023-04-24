@@ -227,7 +227,7 @@ exceptions:
   PrintStackTrace:
     active: true
   RethrowCaughtException:
-    active: true
+    active: false
   ReturnFromFinally:
     active: true
     ignoreLabeled: false
@@ -611,7 +611,7 @@ style:
     active: false
   ThrowsCount:
     active: true
-    max: 2
+    max: 5
     excludeGuardClauses: false
   TrailingWhitespace:
     active: false

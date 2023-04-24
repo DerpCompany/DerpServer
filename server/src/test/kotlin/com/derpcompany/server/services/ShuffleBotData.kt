@@ -47,6 +47,15 @@ object ShuffleBotData {
                                 value=10,
                                 focused= OptionalBoolean.Missing
                             )),
+                    ),
+                    OptionData(
+                        name="move",
+                        value= Optional.Value(
+                            CommandArgument.BooleanArgument(
+                                name="move",
+                                value=false,
+                                focused= OptionalBoolean.Missing
+                            )),
                     )
                 )
             ),

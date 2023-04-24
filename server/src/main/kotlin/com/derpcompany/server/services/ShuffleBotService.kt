@@ -3,16 +3,23 @@ package com.derpcompany.server.services
 import com.derpcompany.server.Qualifiers
 import dev.kord.common.entity.ChannelType
 import dev.kord.common.entity.Snowflake
+import dev.kord.common.entity.optional.value
 import dev.kord.core.Kord
+import dev.kord.core.behavior.edit
+import dev.kord.core.entity.Member
 import dev.kord.core.entity.channel.VoiceChannel
 import dev.kord.core.entity.interaction.GuildChatInputCommandInteraction
 import dev.kord.rest.builder.message.modify.InteractionResponseModifyBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Author: cramsan
@@ -27,6 +34,8 @@ class ShuffleBotService(
     @Qualifier(Qualifiers.SHUFFLE_BOT)
     private val kord: Kord,
     private val random: Random,
+    private val scope: CoroutineScope,
+    private val discordChannelService: DiscordChannelService,
 ) {
 
     /**
@@ -38,9 +47,11 @@ class ShuffleBotService(
     ): InteractionResponseModifyBuilder.() -> Unit {
         val command = interaction.command
         val channelId: Snowflake = interaction.channelId
+        val guildId: Snowflake = interaction.guildId
 
         // Get an argument passed in the command
         val groupCount = command.integers.getValue("groups")
+        val moveToChannels = command.booleans.getValue("move")
 
         // Fetch the channel to ensure we are on an audio channel
         val channel = kord.getChannel(id = channelId) ?: throw IllegalStateException("Failed to fetch channel")
@@ -54,11 +65,14 @@ class ShuffleBotService(
         val voiceChannel = kord.getChannelOf<VoiceChannel>(id = channelId) ?: throw IllegalStateException(
             "Failed to fetch voice channel",
         )
+        val parentId: Snowflake? = voiceChannel.data.parentId?.value
 
         // Get the list of members in this channel
-        val membersRaw = voiceChannel.voiceStates.toList()
+        val membersRaw = voiceChannel.voiceStates.toList().map {
+            it.getMember()
+        }
         val members = membersRaw.map {
-            it.getMember().username
+            it.username
         }
 
         // Check if there is at least one person in the VC
@@ -71,11 +85,43 @@ class ShuffleBotService(
         val usernames = members.joinToString(", ")
         logger.debug("Members in channel ${channel.data.name.value}, to be split in $groupCount groups: [$usernames]")
 
-        val shuffledMembers = shuffleUsers(members, groupCount.toInt())
+        val shuffledMembers = shuffleUsers(membersRaw, groupCount.toInt())
+
+        if (moveToChannels) {
+            moveUsersToTempChannelsAsync(
+                shuffledMembers,
+                guildId = guildId,
+                parentId = parentId,
+            )
+        }
 
         // Build the response
         return {
-            content = printShuffledMembers(shuffledMembers)
+            content = printShuffledMembers(shuffledMembers, moveToChannels)
+        }
+    }
+
+    private fun moveUsersToTempChannelsAsync(
+        shuffledMembers: List<List<Member>>,
+        guildId: Snowflake,
+        parentId: Snowflake?,
+    ) {
+        logger.info("Creating temp ${shuffledMembers.size} temp folders for server $guildId and parentId $parentId")
+        scope.launch {
+            delay(5.seconds)
+
+            shuffledMembers.forEach { group ->
+                val tempChannel = discordChannelService.createTempVoiceChannel(
+                    guildId = guildId,
+                    parentId = parentId,
+                )
+
+                group.forEach { member ->
+                    member.edit {
+                        voiceChannelId = tempChannel.id
+                    }
+                }
+            }
         }
     }
 
@@ -84,14 +130,14 @@ class ShuffleBotService(
      * Return a list of groups created and their respective list of users
      */
     fun shuffleUsers(
-        members: List<String>,
+        members: List<Member>,
         groupCount: Int,
-    ): List<List<String>> {
+    ): List<List<Member>> {
         if (groupCount <= 0) {
             return emptyList()
         }
 
-        val groupList: MutableList<MutableList<String>> = mutableListOf()
+        val groupList: MutableList<MutableList<Member>> = mutableListOf()
 
         // Shuffle the list of members and save in a new list
         val shuffledMembers = members.shuffled(random)
@@ -101,7 +147,7 @@ class ShuffleBotService(
         val groupSize = totalMembers / groupCount // already will floor the val when dividing two ints
 
         // create your groups and add them to a list
-        val smallGroup: MutableList<String> = mutableListOf()
+        val smallGroup: MutableList<Member> = mutableListOf()
         shuffledMembers.forEachIndexed { _, member ->
             smallGroup.add(member)
             if (smallGroup.size == groupSize) {
@@ -127,7 +173,8 @@ class ShuffleBotService(
      * results of the shuffle
      */
     fun printShuffledMembers(
-        shuffledMembers: List<List<String>>,
+        shuffledMembers: List<List<Member>>,
+        moveToChannels: Boolean,
     ): String {
         if (shuffledMembers.isEmpty()) {
             return "Could not create any group."
@@ -135,9 +182,15 @@ class ShuffleBotService(
 
         val shuffleString = StringBuilder()
 
+        if (moveToChannels) {
+            shuffleString.append("Users will be automatically moved.\n\n")
+        }
+
         shuffledMembers.forEachIndexed { index, members ->
+            val memberUsernames = members.map { it.username }
+
             shuffleString.append("Group ${index + 1}: ")
-            val membersString = members.joinToString(", ")
+            val membersString = memberUsernames.joinToString(", ")
             shuffleString.append(membersString)
             shuffleString.append("\n")
         }

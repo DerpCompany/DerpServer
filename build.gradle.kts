@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "1.7.0" apply false
     kotlin("multiplatform") version "1.7.0" apply false
     kotlin("plugin.spring") version "1.7.0" apply false
+    kotlin("plugin.serialization") version "1.7.0" apply false
     id("io.gitlab.arturbosch.detekt") version "1.20.0" apply false
     id("org.openapi.generator") version "6.0.0" apply false
 }

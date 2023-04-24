@@ -13,6 +13,7 @@ plugins {
     kotlin("plugin.spring")
     id("io.gitlab.arturbosch.detekt")
     id("org.openapi.generator")
+    kotlin("plugin.serialization")
     jacoco
 }
 
