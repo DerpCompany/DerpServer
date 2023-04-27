@@ -58,9 +58,17 @@ class ShuffleBotController(
                 logger.info("GuildChatInputCommandInteractionCreateEvent received")
                 logger.debug("Received event data: {}", this.interaction)
 
+                val command = this.interaction.command
+                val groupCount = command.integers.getValue("groups")
+                val moveToChannels = command.booleans["move"] ?: false
+
                 val deferredResponse = interaction.deferPublicResponse()
                 val responseBuilder = try {
-                    shuffleBotService.handleInteraction(this.interaction)
+                    shuffleBotService.handleInteraction(
+                        this.interaction,
+                        groupCount,
+                        moveToChannels,
+                    )
                 } catch (cancellation: CancellationException) {
                     throw cancellation
                 } catch (throwable: Throwable) {
