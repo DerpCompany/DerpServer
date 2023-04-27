@@ -151,7 +151,7 @@ class ShuffleBotServiceTest {
         )
 
         // DO
-        val responseBuilder = service.handleInteraction(interaction)
+        val responseBuilder = service.handleInteraction(interaction, 3, false)
         val response = InteractionResponseModifyBuilder().apply(responseBuilder)
 
         // ASSERT

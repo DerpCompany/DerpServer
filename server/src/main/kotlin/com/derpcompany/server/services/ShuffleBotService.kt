@@ -7,9 +7,13 @@ import dev.kord.common.entity.optional.value
 import dev.kord.core.Kord
 import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Member
+import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.core.entity.channel.VoiceChannel
 import dev.kord.core.entity.interaction.GuildChatInputCommandInteraction
 import dev.kord.rest.builder.message.modify.InteractionResponseModifyBuilder
+import dev.kord.rest.request.HttpStatus
+import dev.kord.rest.request.KtorRequestException
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
@@ -44,14 +48,12 @@ class ShuffleBotService(
      */
     suspend fun handleInteraction(
         interaction: GuildChatInputCommandInteraction,
+        groupCount: Long,
+        moveToChannels: Boolean,
     ): InteractionResponseModifyBuilder.() -> Unit {
         val command = interaction.command
         val channelId: Snowflake = interaction.channelId
         val guildId: Snowflake = interaction.guildId
-
-        // Get an argument passed in the command
-        val groupCount = command.integers.getValue("groups")
-        val moveToChannels = command.booleans.getValue("move")
 
         // Fetch the channel to ensure we are on an audio channel
         val channel = kord.getChannel(id = channelId) ?: throw IllegalStateException("Failed to fetch channel")
@@ -92,6 +94,7 @@ class ShuffleBotService(
                 shuffledMembers,
                 guildId = guildId,
                 parentId = parentId,
+                responseChannelId = voiceChannel.id,
             )
         }
 
@@ -105,22 +108,35 @@ class ShuffleBotService(
         shuffledMembers: List<List<Member>>,
         guildId: Snowflake,
         parentId: Snowflake?,
+        responseChannelId: Snowflake,
     ) {
         logger.info("Creating temp ${shuffledMembers.size} temp folders for server $guildId and parentId $parentId")
         scope.launch {
             delay(5.seconds)
 
-            shuffledMembers.forEach { group ->
-                val tempChannel = discordChannelService.createTempVoiceChannel(
-                    guildId = guildId,
-                    parentId = parentId,
-                )
+            try {
+                shuffledMembers.forEach { group ->
+                    val tempChannel = discordChannelService.createTempVoiceChannel(
+                        guildId = guildId,
+                        parentId = parentId,
+                    )
 
-                group.forEach { member ->
-                    member.edit {
-                        voiceChannelId = tempChannel.id
+                    group.forEach { member ->
+                        member.edit {
+                            voiceChannelId = tempChannel.id
+                        }
                     }
                 }
+            } catch (exception: KtorRequestException) {
+                val errorMessage = when (exception.status.toKtorStatusCode()) {
+                    HttpStatusCode.Forbidden -> """
+                        There was an error creating a channel. Please verify I have all permissions.
+                    """.trimIndent()
+                    else -> "Something went wrong. Please report this to the admins."
+                }
+
+                val channel = kord.getChannelOf<MessageChannel>(id = responseChannelId)
+                channel?.createMessage(errorMessage)
             }
         }
     }
@@ -201,3 +217,8 @@ class ShuffleBotService(
         var logger: Logger = LoggerFactory.getLogger(ShuffleBotService::class.java)
     }
 }
+
+private fun HttpStatus.toKtorStatusCode(): HttpStatusCode = HttpStatusCode(
+    value = code,
+    description = message,
+)

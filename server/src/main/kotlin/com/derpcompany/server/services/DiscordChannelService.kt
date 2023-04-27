@@ -43,7 +43,7 @@ class DiscordChannelService(
     fun cleanUp() {
         scope.launch {
             val channels = channelRepository.findAll()
-            logger.info("Inspecting ${channels.size} channels")
+            logger.debug("Inspecting ${channels.size} channels")
 
             channels.forEach {
                 try {
@@ -71,6 +71,7 @@ class DiscordChannelService(
                     kord.rest.channel.deleteChannel(
                         channelId = savedChannel.id,
                     )
+                    channelRepository.delete(it)
                 } catch (t: Throwable) {
                     logger.error("Error while cleaning up channel: ${it.name}(${it.channelId})")
                     logger.error(t)
@@ -80,7 +81,10 @@ class DiscordChannelService(
             }
         }
     }
-    suspend fun createTempVoiceChannel(guildId: Snowflake, parentId: Snowflake?): DiscordChannel {
+    suspend fun createTempVoiceChannel(
+        guildId: Snowflake,
+        parentId: Snowflake?,
+    ): DiscordChannel {
         val name = "$CHANNEL_PREFIX${adjectives.random(random)} ${animals.random(random)}"
 
         logger.info("Creating temp voice channel $name")
