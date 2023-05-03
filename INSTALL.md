@@ -7,6 +7,12 @@ Derp Company Server Installation
 - Systemd support
 - Java 17
 
+**Make sure to follow this step before continuing**
+
+Enable running services without needing to be signed in by running this command.
+
+`loginctl enable-linger $USER`
+
 ## Automatic Installation
 
 The automatic installation will execute the steps in the **Manual Installation** phase. If this is your first time installing
@@ -45,16 +51,15 @@ The final jar will be found in `server/build/libs/derpserver.jar`.
 Create a location for the executable and the config file.
 
 ```
-sudo mkdir /opt/derpserver/
-chown $USER:$GROUP /opt/derpserver/
+mkdir $HOME/.local/derpserver
 ```
 
 Copy the executable and create an empty config file.
 
 ```
-cp server/build/libs/derpserver.jar /opt/derpserver/derpserver.jar
+cp server/build/libs/derpserver.jar $HOME/.local/derpserver
 
-touch /opt/derpserver/application.properties
+touch $HOME/.local/derpserver/application.properties
 ```
 
 ### 3. Configure the service
@@ -66,25 +71,24 @@ Edit the `application.properties` file with the properties required by the servi
 You can use the template for a systemd service. Copy it to your system.
 
 ```
-sudo cp server/install/derpserver.service /etc/systemd/system/derpserver.service
+mkdir -p $HOME/.config/systemd/user
+cp derpserver.service $HOME/.config/systemd/user
 ```
-
-You should edit the file to make sure it points to the right folder and to set the correct user to use.
 
 Now load the service
 
-```systemctl daemon-reload```
+```systemctl --user daemon-reload```
 
 ### 5. Start the service
 
 You can start the service directly from the command line:
 
-```/opt/derpserver/derpserver.jar```
+```derpserver.jar```
 
 Or use systemd:
 
-```systemctl start derpserver.service```
+```systemctl --user start derpserver.service```
 
 to enable the service on boot you can use:
 
-```systemctl enable derpserver.service```
+```systemctl --user enable derpserver.service```
